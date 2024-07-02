@@ -10,3 +10,5 @@ sys.path.insert(0, str(venv_path))
 print(f'Path: {pathlib.Path(__file__).parent.resolve()}')
 print(f'Path: {pathlib.Path().resolve()}')
 print(sys.version) 
+print("hello ykip10")
+    

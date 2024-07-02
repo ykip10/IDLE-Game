@@ -4,11 +4,17 @@ print("hello cookies")
 import pathlib
 from pathlib import Path 
 import sys
+import pygame
 
-venv_path = Path(r'C:\Users\YKip1\OneDrive\Desktop\cookies\.venv\Lib\site-packages')
-sys.path.insert(0, str(venv_path))
-print(f'Path: {pathlib.Path(__file__).parent.resolve()}')
-print(f'Path: {pathlib.Path().resolve()}')
-print(sys.version) 
-print("hello ykip10")
-    
+
+#Game Window
+screen_width = 1280
+screen_height = 720
+screen = pygame.display.set_mode((screen_width, screen_height))
+
+run = True
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+pygame.quit()

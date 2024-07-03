@@ -4,15 +4,29 @@ import numpy as np
 pygame.init()
 
 FPS = 30
+NATIVE_WIDTH = 1280
+NATIVE_HEIGHT = 720
 #Colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 clock = pygame.time.Clock()
 
 #Screen Settings
-screen_width = 1280
-screen_height = 720
-screen = pygame.display.set_mode((screen_width, screen_height))
+width = 1280
+height = 720
+screen = pygame.display.set_mode((width, height))
+
+def scaled_x(x):
+    """
+    Returns x-coordinate scaled to custom resolutions
+    """
+    return width * x / NATIVE_WIDTH
+
+def scaled_y(y):
+    """
+    Returns y-coordinate scaled to custom resolutions
+    """
+    return height * y / NATIVE_HEIGHT
 
 #Resources Class
 class Resource:
@@ -108,36 +122,40 @@ while run:
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if 600 <= mouse_x <= 1280 and 0 <= mouse_y <= 720:
+            if width * 600/1280 <= mouse_x <= width and 0 <= mouse_y <= height:
                 for i in range(Resource.id_no):                                      
                     Resource.get_resource(i).add(Resource.get_resource(i).click_rate)
-            elif 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
+            elif scaled_x(15) <= mouse_x <= scaled_x(200) and scaled_y(100) <= mouse_y <= scaled_y(130):      #Purchase generator 1
                 generator1.buy()
-            elif 15 <= mouse_x <= 200 and 150 <= mouse_y <= 180:   #Purchase generator 2
+            elif scaled_x(15) <= mouse_x <= scaled_x(200) and scaled_y(150) <= mouse_y <= scaled_y(180):   #Purchase generator 2
                 generator2.buy()
 
     
-    #Update Resource Generators
+    #Update Resource Generators and get total rate
+    total_rate = 0
     for i in range(Generator.id_no):                                      
         Generator.get_gen(i).update()
+        total_rate += Generator.get_gen(i).rate
 
     #Fill screen with black
     screen.fill(BLACK)
 
     #Draw Visuals & Buttons
-    draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
-    draw_text(screen, str(gems), 150, 10)
-    
+    draw_text(screen, str(money), scaled_x(10), scaled_y(10))                           #Current Resource Amount
+    draw_text(screen, str(gems), scaled_x(200), scaled_y(10))                           # Gem count
+    draw_text(screen, f'Income: {str(total_rate)}g/s', scaled_x(390), scaled_y(10))     # Current income 
 
-    pygame.draw.rect(screen, (0, 128, 0), (600, 0, 720, 720))      #Clicking area
-    pygame.draw.rect(screen, (0, 128, 0), (15, 100, 200, 30))    #screen, RGB, position(x1,y1,x2,y2)
-    draw_text(screen, "Buy Generator 1", 20, 100)
-    draw_text(screen, '+' + str(generator1.base_rate) + ' g/s', 225, 100)
-    draw_text(screen, 'Current: ' + str(generator1.rate) + 'g/s', 315, 100)
-    pygame.draw.rect(screen, (0, 128, 0), (15, 150, 200, 30))
-    draw_text(screen, "Buy Generator 2", 20, 150)
-    draw_text(screen, '+' + str(generator2.base_rate) + ' g/s', 225, 150)
-    draw_text(screen, 'Current: ' + str(generator2.rate) + 'g/s', 315, 150)
+    pygame.draw.rect(screen, (0, 128, 0), (scaled_x(600), scaled_y(0), scaled_x(720), scaled_y(720)))      #Clicking area
+    pygame.draw.rect(screen, (0, 128, 0), (scaled_x(15), scaled_y(100), scaled_x(200), scaled_y(30)))      #screen, RGB, position(x1,y1,x2,y2)
+
+    # Visuals associated to generators 
+    draw_text(screen, "Buy Generator 1", scaled_x(20), scaled_y(100))
+    draw_text(screen, '+' + str(generator1.base_rate) + ' g/s', scaled_x(225), scaled_y(100))
+    draw_text(screen, 'Current: ' + str(generator1.rate) + 'g/s', scaled_x(315), scaled_y(100))
+    pygame.draw.rect(screen, (0, 128, 0), (scaled_x(15), scaled_y(150), scaled_x(200), scaled_y(30)))
+    draw_text(screen, "Buy Generator 2", scaled_x(20), scaled_y(150))
+    draw_text(screen, '+' + str(generator2.base_rate) + ' g/s', scaled_x(225),  scaled_y(150))
+    draw_text(screen, 'Current: ' + str(generator2.rate) + 'g/s', scaled_x(315), scaled_y(150))
     
 
     #Update Display

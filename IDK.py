@@ -7,7 +7,6 @@ FPS = 30
 #Colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
 clock = pygame.time.Clock()
 
 #Screen Settings
@@ -17,23 +16,32 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 #Resources Class
 class Resource:
-    def __init__(self, name, amount=0):
+    def __init__(self, name):
         self.name = name                                #Name of Resource
-        self.amount = amount                            #Resource Amount
+        self.amount = 0                            #Resource Amount
 
     def add(self, amount):
         self.amount += amount                           #Increase resource value by "amount"
 
     def __str__(self):
         return f"{self.name}: {self.amount}"            #Returns resource name and amount
+    
+    def purchasable(self,price):
+        if self.amount >= price:
+            return True
+        else:
+            return False
+        
 
-# Generator class                                    
+# Generator class                                    py
 class Generator:                                     
-    def __init__(self, name, resource, rate):       
+    def __init__(self, name, resource, base_rate,cost):       
         self.name = name                                #Name of Generator
         self.resource = resource                        #Resource Generator makes      
-        self.rate = rate                                #Resource generation rate
+        self.base_rate = base_rate
+        self.rate = 0                                #Resource generation rate
         self.last_update = pygame.time.get_ticks()      #Stores time since last update (ms)
+        self.cost = cost
 
     def update(self):
         now = pygame.time.get_ticks()
@@ -42,21 +50,22 @@ class Generator:
             self.resource.add(self.rate)
             self.last_update = now
 
+    def buy(self):
+        if self.resource.purchasable(self.cost):                            #checks if player can purchase generator
+            money.amount -= self.cost                            #deducts cost if player can purchase generator
+            self.rate += self.base_rate                  #increases production of generator by the rate increase ##
+
 #Resource Types
-money = Resource("Money", 0)                            #Standard resource to buy upgrades
-Gems = Resource("Gems", 0)                               #Rare & Premium currency
+money = Resource("Money")                            #Standard resource to buy upgrades
+gems = Resource("Gems")                               #Rare & Premium currency
 
 #Resource Generator                                           
-generator1 = Generator("generator1", money, 1)          #tier 1 generator
-generator2 = Generator("generator2", money, 0)          #tier 2 generator
-generator3 = Generator("generator3", money, 0)         #tier 3 generator
+generator1 = Generator("generator1", money, 1,10)          #tier 1 generator
+generator2 = Generator("generator2", money, 5,100)          #tier 2 generator
+generator3 = Generator("generator3", money, 20,1000)         #tier 3 generator
 
 #Buying Producers
-def buy_producer(producer, cost, rate_increase):
-    global money
-    if money.amount >= cost:                            #checks if player can purchase generator
-        money.amount -= cost                            #deducts cost if player can purchase generator
-        producer.rate += rate_increase                  #increases production of generator by the rate increase
+
 
 # Font
 font = pygame.font.Font(None, 36)
@@ -76,9 +85,9 @@ while run:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             if 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
-                buy_producer(generator1, 10, 1)
+                generator1.buy()
             elif 15 <= mouse_x <= 200 and 150 <= mouse_y <= 180:   #Purchase generator 2
-                buy_producer(generator2, 100, 5)
+                generator2.buy()
 
     
     #Update Resource Generators
@@ -91,7 +100,7 @@ while run:
 
     #Draw Visuals & Buttons
     draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
-    draw_text(screen, str(Gems), 200, 10)
+    draw_text(screen, str(gems), 200, 10)
     pygame.draw.rect(screen, (0, 128, 0), (15, 100, 200, 30))    #screen, RGB, position(x1,y1,x2,y2)
     draw_text(screen, "Buy Generator 1", 20, 100)
     pygame.draw.rect(screen, (0, 128, 0), (15, 150, 200, 30))

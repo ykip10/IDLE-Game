@@ -16,12 +16,15 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 #Resources Class
 class Resource:
-    def __init__(self, name):
+    id_no = 0
+    id_list = []
+    id_to_resource = dict()
+    def __init__(self, name, click_rate):
         self.name = name                                #Name of Resource
         self.amount = 0                            #Resource Amount
 
     def add(self, amount):
-        self.amount += amount                           #Increase resource value by "amount"
+        self.amount += amount                           # Increase resource value by "amount"
 
     def __str__(self):
         return f"{self.name}: {self.amount}"            #Returns resource name and amount
@@ -56,8 +59,9 @@ class Generator:
             self.rate += self.base_rate                  #increases production of generator by the rate increase ##
 
 #Resource Types
-money = Resource("Money")                            #Standard resource to buy upgrades
-gems = Resource("Gems")                               #Rare & Premium currency
+money = Resource("Money", 1)                            #Standard resource to buy upgrades
+gems = Resource("Gems", 0)                              #Rare & Premium currency
+
 
 #Resource Generator                                           
 generator1 = Generator("generator1", money, 1,10)          #tier 1 generator
@@ -84,7 +88,10 @@ while run:
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
+            if 600 <= mouse_x <= 1000 and 0 <= mouse_y <= 720:
+                for i in range(Resource.id_no):                                      
+                    Resource.get_resource(i).add(Resource.get_resource(i).click_rate)
+            elif 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
                 generator1.buy()
             elif 15 <= mouse_x <= 200 and 150 <= mouse_y <= 180:   #Purchase generator 2
                 generator2.buy()
@@ -101,6 +108,7 @@ while run:
     #Draw Visuals & Buttons
     draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
     draw_text(screen, str(gems), 200, 10)
+    pygame.draw.rect(screen, (0, 128, 0), (600, 0, 1000, 720))      #Clicking area
     pygame.draw.rect(screen, (0, 128, 0), (15, 100, 200, 30))    #screen, RGB, position(x1,y1,x2,y2)
     draw_text(screen, "Buy Generator 1", 20, 100)
     pygame.draw.rect(screen, (0, 128, 0), (15, 150, 200, 30))

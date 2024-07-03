@@ -22,6 +22,11 @@ class Resource:
     def __init__(self, name, click_rate):
         self.name = name                                #Name of Resource
         self.amount = 0                            #Resource Amount
+        self.click_rate = click_rate
+        self.id = Resource.id_no
+        Resource.id_no += 1
+        Resource.id_list.append(self.id)
+        Resource.id_to_resource.update({self.id:self})
 
     def add(self, amount):
         self.amount += amount                           # Increase resource value by "amount"
@@ -35,9 +40,15 @@ class Resource:
         else:
             return False
         
+    def get_resource(id_number):
+        return Resource.id_to_resource.get(id_number)
+        
 
 # Generator class                                    py
 class Generator:                                     
+    id_no = 0
+    id_list = []
+    id_to_generator = dict()
     def __init__(self, name, resource, base_rate,cost):       
         self.name = name                                #Name of Generator
         self.resource = resource                        #Resource Generator makes      
@@ -45,6 +56,10 @@ class Generator:
         self.rate = 0                                #Resource generation rate
         self.last_update = pygame.time.get_ticks()      #Stores time since last update (ms)
         self.cost = cost
+        self.id = Generator.id_no
+        Generator.id_no += 1
+        Generator.id_list.append(self.id)
+        Generator.id_to_generator.update({self.id:self})
 
     def update(self):
         now = pygame.time.get_ticks()
@@ -57,6 +72,9 @@ class Generator:
         if self.resource.purchasable(self.cost):                            #checks if player can purchase generator
             money.amount -= self.cost                            #deducts cost if player can purchase generator
             self.rate += self.base_rate                  #increases production of generator by the rate increase ##
+
+    def get_gen(id_number):
+        return Generator.id_to_generator.get(id_number)
 
 #Resource Types
 money = Resource("Money", 1)                            #Standard resource to buy upgrades
@@ -92,7 +110,7 @@ while run:
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if 600 <= mouse_x <= 1000 and 0 <= mouse_y <= 720:
+            if 600 <= mouse_x <= 1280 and 0 <= mouse_y <= 720:
                 for i in range(Resource.id_no):                                      
                     Resource.get_resource(i).add(Resource.get_resource(i).click_rate)
             elif 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
@@ -102,9 +120,8 @@ while run:
 
     
     #Update Resource Generators
-    generator1.update()
-    generator2.update()
-    generator3.update()
+    for i in range(Generator.id_no):                                      
+        Generator.get_gen(i).update()
 
     #Fill screen with black
     screen.fill(BLACK)
@@ -112,7 +129,7 @@ while run:
     #Draw Visuals & Buttons
     draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
     draw_text(screen, str(gems), 200, 10)
-    pygame.draw.rect(screen, (0, 128, 0), (600, 0, 1000, 720))      #Clicking area
+    pygame.draw.rect(screen, (0, 128, 0), (600, 0, 720, 720))      #Clicking area
     pygame.draw.rect(screen, (0, 128, 0), (15, 100, 200, 30))    #screen, RGB, position(x1,y1,x2,y2)
     draw_text(screen, "Buy Generator 1", 20, 100)
     pygame.draw.rect(screen, (0, 128, 0), (15, 150, 200, 30))

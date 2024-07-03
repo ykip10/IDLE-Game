@@ -19,8 +19,8 @@ ball = pygame.image.load(r'sprites\ball.jpg')
 ballrect = ball.get_rect()
 ballrect = ballrect.move(500, 200)
 
-velocity = [0, 10] # initial speed
-acceleration = [0, -0.098] # acceleration
+velocity = [0, -8] # initial speed
+acceleration = [0, 0.098] # acceleration
 
 run = True
 while run:
@@ -30,9 +30,13 @@ while run:
 
     ballrect = ballrect.move(velocity)
     velocity = np.add(velocity, acceleration)
+    if ballrect.bottom > screen_height:
+        velocity = [0, -8]
 
     screen.blit(terrain, terrainrect)
     screen.blit(ball, ballrect)
     clock.tick(FPS)
+
+   
     pygame.display.flip() 
 pygame.quit()

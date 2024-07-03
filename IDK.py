@@ -44,12 +44,12 @@ class Generator:
 
 #Resource Types
 money = Resource("Money", 0)                            #Standard resource to buy upgrades
-Gems = Resource("Gem", 0)                               #Rare & Premium currency
+Gems = Resource("Gems", 0)                               #Rare & Premium currency
 
 #Resource Generator                                           
 generator1 = Generator("generator1", money, 1)          #tier 1 generator
-generator2 = Generator("generator2", money, 5)          #tier 2 generator
-generator3 = Generator("generator3", money, 25)         #tier 3 generator
+generator2 = Generator("generator2", money, 0)          #tier 2 generator
+generator3 = Generator("generator3", money, 0)         #tier 3 generator
 
 #Buying Producers
 def buy_producer(producer, cost, rate_increase):
@@ -75,9 +75,9 @@ while run:
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if 10 <= mouse_x <= 110 and 100 <= mouse_y <= 150:      #Purchase generator 1
+            if 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
                 buy_producer(generator1, 10, 1)
-            elif 120 <= mouse_x <= 220 and 100 <= mouse_y <= 150:   #Purchase generator 2
+            elif 15 <= mouse_x <= 200 and 150 <= mouse_y <= 180:   #Purchase generator 2
                 buy_producer(generator2, 100, 5)
 
     
@@ -91,11 +91,11 @@ while run:
 
     #Draw Visuals & Buttons
     draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
-    draw_text(screen, str(Gems), 500, 10)
-    #pygame.draw.rect(screen, (0, 128, 0), (20, 400, 50, 100))    #screen, RGB, position(x1,y1,x2,y2)
+    draw_text(screen, str(Gems), 200, 10)
+    pygame.draw.rect(screen, (0, 128, 0), (15, 100, 200, 30))    #screen, RGB, position(x1,y1,x2,y2)
     draw_text(screen, "Buy Generator 1", 20, 100)
-    pygame.draw.rect(screen, (0, 128, 0), (50, 20, 500, 100))
-    draw_text(screen, "Buy Generator 2", 20, 125)
+    pygame.draw.rect(screen, (0, 128, 0), (15, 150, 200, 30))
+    draw_text(screen, "Buy Generator 2", 20, 150)
 
     #Update Display
     pygame.display.flip()

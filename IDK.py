@@ -1,5 +1,6 @@
 import pygame, sys 
 import numpy as np 
+import time
 
 pygame.init()
 
@@ -7,6 +8,7 @@ FPS = 30
 BLACK = 0, 0, 0
 
 clock = pygame.time.Clock()
+
 #Game Window
 screen_width = 1280
 screen_height = 720
@@ -28,15 +30,15 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    ballrect = ballrect.move(velocity)
-    velocity = np.add(velocity, acceleration)
-    if ballrect.bottom > screen_height:
-        velocity = [0, -8]
+    ballrect = ballrect.move(velocity) # Update position 
+    velocity = np.add(velocity, acceleration) # Update velocity 
+
+    if ballrect.bottom > screen_height: # Bounce off the bottom 
+        velocity = [0, -8] 
 
     screen.blit(terrain, terrainrect)
     screen.blit(ball, ballrect)
     clock.tick(FPS)
 
-   
     pygame.display.flip() 
 pygame.quit()

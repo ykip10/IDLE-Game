@@ -7,7 +7,6 @@ FPS = 30
 #Colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
 clock = pygame.time.Clock()
 
 #Screen Settings
@@ -39,11 +38,13 @@ class Resource:
 
 # Generator class                                    py
 class Generator:                                     
-    def __init__(self, name, resource, rate):       
+    def __init__(self, name, resource, base_rate,cost):       
         self.name = name                                #Name of Generator
         self.resource = resource                        #Resource Generator makes      
-        self.rate = rate                                #Resource generation rate
+        self.base_rate = base_rate
+        self.rate = 0                                #Resource generation rate
         self.last_update = pygame.time.get_ticks()      #Stores time since last update (ms)
+        self.cost = cost
 
     def update(self):
         now = pygame.time.get_ticks()
@@ -61,10 +62,11 @@ class Generator:
 money = Resource("Money", 1)                            #Standard resource to buy upgrades
 gems = Resource("Gems", 0)                              #Rare & Premium currency
 
+
 #Resource Generator                                           
-generator1 = Generator("generator1", money, 1)          #tier 1 generator
-generator2 = Generator("generator2", money, 0)          #tier 2 generator
-generator3 = Generator("generator3", money, 0)         #tier 3 generator
+generator1 = Generator("generator1", money, 1,10)          #tier 1 generator
+generator2 = Generator("generator2", money, 5,100)          #tier 2 generator
+generator3 = Generator("generator3", money, 20,1000)         #tier 3 generator
 
 #Buying Producers
 
@@ -92,7 +94,7 @@ while run:
             elif 15 <= mouse_x <= 200 and 100 <= mouse_y <= 130:      #Purchase generator 1
                 generator1.buy()
             elif 15 <= mouse_x <= 200 and 150 <= mouse_y <= 180:   #Purchase generator 2
-                buy_producer(generator2, 100, 5)
+                generator2.buy()
 
     
     #Update Resource Generators

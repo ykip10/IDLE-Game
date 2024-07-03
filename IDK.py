@@ -21,7 +21,7 @@ class Resource:
     id_to_resource = dict()
     def __init__(self, name, click_rate):
         self.name = name                                #Name of Resource
-        self.amount = 0                            #Resource Amount
+        self.amount = 0                                 #Resource Amount
         self.click_rate = click_rate
         self.id = Resource.id_no
         Resource.id_no += 1
@@ -35,11 +35,8 @@ class Resource:
         return f"{self.name}: {self.amount}"            #Returns resource name and amount
     
     def purchasable(self,price):
-        if self.amount >= price:
-            return True
-        else:
-            return False
-        
+        return self.amount >= price
+
     def get_resource(id_number):
         return Resource.id_to_resource.get(id_number)
         
@@ -102,6 +99,7 @@ def draw_text(surface, text, x, y):                     #surface = screen it dra
     surface.blit(text_surface, (x, y))
 
 
+
 #Main Game Loop
 run = True
 while run:
@@ -128,12 +126,19 @@ while run:
 
     #Draw Visuals & Buttons
     draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
-    draw_text(screen, str(gems), 200, 10)
+    draw_text(screen, str(gems), 150, 10)
+    
+
     pygame.draw.rect(screen, (0, 128, 0), (600, 0, 720, 720))      #Clicking area
     pygame.draw.rect(screen, (0, 128, 0), (15, 100, 200, 30))    #screen, RGB, position(x1,y1,x2,y2)
     draw_text(screen, "Buy Generator 1", 20, 100)
+    draw_text(screen, '+' + str(generator1.base_rate) + ' g/s', 225, 100)
+    draw_text(screen, 'Current: ' + str(generator1.rate) + 'g/s', 315, 100)
     pygame.draw.rect(screen, (0, 128, 0), (15, 150, 200, 30))
     draw_text(screen, "Buy Generator 2", 20, 150)
+    draw_text(screen, '+' + str(generator2.base_rate) + ' g/s', 225, 150)
+    draw_text(screen, 'Current: ' + str(generator2.rate) + 'g/s', 315, 150)
+    
 
     #Update Display
     pygame.display.flip()

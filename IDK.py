@@ -94,19 +94,10 @@ class Generator:
 money = Resource("Money", 1)                            #Standard resource to buy upgrades
 gems = Resource("Gems", 0)                              #Rare & Premium currency
 
-
 #Resource Generator                                           
 generator1 = Generator("generator1", money, 1,10)          #tier 1 generator
 generator2 = Generator("generator2", money, 5,100)          #tier 2 generator
 generator3 = Generator("generator3", money, 20,1000)         #tier 3 generator
-
-#Buying Producers
-
-def buy_producer(producer, cost, rate_increase):
-    if money.amount >= cost:                            #checks if player can purchase generator
-        money.amount -= cost                            #deducts cost if player can purchase generator
-        producer.rate += rate_increase                  #increases production of generator by the rate increase
-
       
 # Font
 font = pygame.font.Font(None, 36)

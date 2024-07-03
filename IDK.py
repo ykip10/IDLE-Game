@@ -53,7 +53,6 @@ generator3 = Generator("generator3", money, 0)         #tier 3 generator
 
 #Buying Producers
 def buy_producer(producer, cost, rate_increase):
-    global money
     if money.amount >= cost:                            #checks if player can purchase generator
         money.amount -= cost                            #deducts cost if player can purchase generator
         producer.rate += rate_increase                  #increases production of generator by the rate increase
@@ -102,5 +101,3 @@ while run:
 #Quit Pygame
 pygame.quit()
 sys.exit()
-
-

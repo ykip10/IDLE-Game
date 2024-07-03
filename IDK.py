@@ -91,10 +91,10 @@ while run:
 
     #Draw Visuals & Buttons
     draw_text(screen, str(money), 10, 10)                           #Current Resource Amount
-    draw_text(screen, str(Gems), 50, 10)
-    #pygame.draw.rect(screen, (66, 245, 209), (20, 400, 50, 100))    #screen, RGB, position(x1,y1,x2,y2)
+    draw_text(screen, str(Gems), 500, 10)
+    #pygame.draw.rect(screen, (0, 128, 0), (20, 400, 50, 100))    #screen, RGB, position(x1,y1,x2,y2)
     draw_text(screen, "Buy Generator 1", 20, 100)
-    pygame.draw.rect(screen, (66, 245, 209), (50, 20, 500, 100))
+    pygame.draw.rect(screen, (0, 128, 0), (50, 20, 500, 100))
     draw_text(screen, "Buy Generator 2", 20, 125)
 
     #Update Display

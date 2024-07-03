@@ -16,13 +16,13 @@ width = 1280
 height = 720
 screen = pygame.display.set_mode((width, height))
 
-def scaled_x(x):
+def x(x):
     """
     Returns x-coordinate scaled to custom resolutions
     """
     return width * x / NATIVE_WIDTH
 
-def scaled_y(y):
+def y(y):
     """
     Returns y-coordinate scaled to custom resolutions
     """
@@ -125,9 +125,9 @@ while run:
             if width * 600/1280 <= mouse_x <= width and 0 <= mouse_y <= height:
                 for i in range(Resource.id_no):                                      
                     Resource.get_resource(i).add(Resource.get_resource(i).click_rate)
-            elif scaled_x(15) <= mouse_x <= scaled_x(200) and scaled_y(100) <= mouse_y <= scaled_y(130):      #Purchase generator 1
+            elif x(15) <= mouse_x <= x(200) and y(100) <= mouse_y <= y(130):      #Purchase generator 1
                 generator1.buy()
-            elif scaled_x(15) <= mouse_x <= scaled_x(200) and scaled_y(150) <= mouse_y <= scaled_y(180):   #Purchase generator 2
+            elif x(15) <= mouse_x <= x(200) and y(150) <= mouse_y <= y(180):   #Purchase generator 2
                 generator2.buy()
 
     
@@ -141,21 +141,21 @@ while run:
     screen.fill(BLACK)
 
     #Draw Visuals & Buttons
-    draw_text(screen, str(money), scaled_x(10), scaled_y(10))                           #Current Resource Amount
-    draw_text(screen, str(gems), scaled_x(200), scaled_y(10))                           # Gem count
-    draw_text(screen, f'Income: {str(total_rate)}g/s', scaled_x(390), scaled_y(10))     # Current income 
+    draw_text(screen, str(money), x(10), y(10))                           #Current Resource Amount
+    draw_text(screen, str(gems), x(200), y(10))                           # Gem count
+    draw_text(screen, f'Income: {str(total_rate)}g/s', x(390), y(10))     # Current income 
 
-    pygame.draw.rect(screen, (0, 128, 0), (scaled_x(600), scaled_y(0), scaled_x(720), scaled_y(720)))      #Clicking area
-    pygame.draw.rect(screen, (0, 128, 0), (scaled_x(15), scaled_y(100), scaled_x(200), scaled_y(30)))      #screen, RGB, position(x1,y1,x2,y2)
+    pygame.draw.rect(screen, (0, 128, 0), (x(600), y(0), x(720), y(720)))      #Clicking area
+    pygame.draw.rect(screen, (0, 128, 0), (x(15), y(100), x(200), y(30)))      #screen, RGB, position(x1,y1,x2,y2)
 
     # Visuals associated to generators 
-    draw_text(screen, "Buy Generator 1", scaled_x(20), scaled_y(100))
-    draw_text(screen, '+' + str(generator1.base_rate) + ' g/s', scaled_x(225), scaled_y(100))
-    draw_text(screen, 'Current: ' + str(generator1.rate) + 'g/s', scaled_x(315), scaled_y(100))
-    pygame.draw.rect(screen, (0, 128, 0), (scaled_x(15), scaled_y(150), scaled_x(200), scaled_y(30)))
-    draw_text(screen, "Buy Generator 2", scaled_x(20), scaled_y(150))
-    draw_text(screen, '+' + str(generator2.base_rate) + ' g/s', scaled_x(225),  scaled_y(150))
-    draw_text(screen, 'Current: ' + str(generator2.rate) + 'g/s', scaled_x(315), scaled_y(150))
+    draw_text(screen, "Buy Generator 1", x(20), y(100))
+    draw_text(screen, '+' + str(generator1.base_rate) + ' g/s', x(225), y(100))
+    draw_text(screen, 'Current: ' + str(generator1.rate) + 'g/s', x(315), y(100))
+    pygame.draw.rect(screen, (0, 128, 0), (x(15), y(150), x(200), y(30)))
+    draw_text(screen, "Buy Generator 2", x(20), y(150))
+    draw_text(screen, '+' + str(generator2.base_rate) + ' g/s', x(225),  y(150))
+    draw_text(screen, 'Current: ' + str(generator2.rate) + 'g/s', x(315), y(150))
     
 
     #Update Display

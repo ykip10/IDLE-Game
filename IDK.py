@@ -87,7 +87,14 @@ generator2 = Generator("generator2", money, 5,100)          #tier 2 generator
 generator3 = Generator("generator3", money, 20,1000)         #tier 3 generator
 
 #Buying Producers
+<<<<<<< HEAD
+def buy_producer(producer, cost, rate_increase):
+    if money.amount >= cost:                            #checks if player can purchase generator
+        money.amount -= cost                            #deducts cost if player can purchase generator
+        producer.rate += rate_increase                  #increases production of generator by the rate increase
+=======
 
+>>>>>>> b255e7f0f2e2878efc2bd81dc1099e72595a666b
 
 # Font
 font = pygame.font.Font(None, 36)
@@ -136,5 +143,3 @@ while run:
 #Quit Pygame
 pygame.quit()
 sys.exit()
-
-

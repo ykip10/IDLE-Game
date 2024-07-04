@@ -1,0 +1,28 @@
+Ideas to implement:
+PVE:
+    PVE spend gold on gear to fight mobs
+    have two modes of combat attack and defense, time click in the small window to
+    hit. parry unlocked later on with a small base chance on perfect combat score 
+    but base chance can be upgraded with resource 
+    
+
+Generators:
+    - add cost multiplier for upgrades range(1.07x - 1.15x is industry standard)
+    - every 100 purchases of a generator = adds a multiplier to the base production
+
+Resource
+
+Game Mechanics:
+    - new Game+ Feature (new resource that can be spent for permanent upgrades, faster early game)
+    introduce it shortly after when hit first plateau
+    - Achievements - increase production of building, click rate and other buffs ex on new game+, start with 1000 money
+    - Other ugprades availiable to purchase with gold 
+    - settings menu
+    - save file
+    - offline increase, 0.1-0.2x produduction of resources while offline
+    - u cant start a new run
+    like u can only unlock that feature once u get all the buildings
+    so u have to fight that mob
+    and u can only fight that mob by accumulating pve xp through active play
+    and if u dont start now its gonna take ages
+    

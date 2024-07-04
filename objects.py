@@ -63,6 +63,6 @@ gold = Resource("Gold", 1)
 gems = Resource("Gems", 0)  
 
 # Resource Generators                                           
-generator1 = Generator("generator1", gold, 1,10)            # tier 1 generator
-generator2 = Generator("generator2", gold, 5,100)           # tier 2 generator
-generator3 = Generator("generator3", gold, 20,1000)         # tier 3 generator     
+generator1 = Generator("generator1", gold, 1, 10)            # tier 1 generator
+generator2 = Generator("generator2", gold, 5, 100)           # tier 2 generator
+generator3 = Generator("generator3", gold, 20, 1000)         # tier 3 generator     

@@ -1,14 +1,8 @@
-import pygame, settings
-from objects import Resource
-import scene_change as sc
-
+import pygame, scenes
 pygame.init()
 
 # Main Game Loop
 def main():
-    engine = sc.DisplayEngine()
-    engine.run(sc.main_scene(engine))   
-
+    engine = scenes.DisplayEngine()
+    engine.run(scenes.main_scene(engine))   
 main()
-
-

@@ -1,4 +1,5 @@
 import pygame, sys, settings
+from main import x, y
 
 # Need something that runs the loop, something that executes specific commands for each scene. 
 
@@ -53,7 +54,7 @@ class main_scene(Scene):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             # Clicking for resources 
-            if x(600) <= mouse_x <= x(width) and y(0) <= mouse_y <= y(height):
+            if x(600) <= mouse_x <=  x(width) and y(0) <= mouse_y <= y(height):
                 for i in range(Resource.id_no):                                      
                     Resource.get_resource(i).add(Resource.get_resource(i).click_rate)
             # Buy Generator Buttons

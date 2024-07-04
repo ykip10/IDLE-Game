@@ -49,7 +49,7 @@ class main_scene(Scene):
     def __init__(self, background):
         self.background = background
     def draw(self, surface):
-        self.surface = 
+        self.surface = surface
     def on_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos

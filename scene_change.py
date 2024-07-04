@@ -86,7 +86,7 @@ class main_scene(scene):
             total_rate += o.Generator.get_gen(i).rate
 
         # Resources info
-        draw_text(screen, str(o.money), x(10), y(10))                           # Current Resource Amount
+        draw_text(screen, str(o.gold), x(10), y(10))                           # Current Resource Amount
         draw_text(screen, str(o.gems), x(200), y(10))                           # Gem count
         draw_text(screen, f'Income: {str(total_rate)}g/s', x(390), y(10))     # Current income 
 
@@ -114,9 +114,9 @@ class main_scene(scene):
                 for i in range(o.Resource.id_no):                                      
                     o.Resource.get_resource(i).add(o.Resource.get_resource(i).click_rate)
             # Buy Generator Buttons
-            elif x(15) <= mouse_x <= x(200) and y(100) <= mouse_y <= y(130):   #Purchase generator 1
+            elif x(15) <= mouse_x <= x(200) and y(100) <= mouse_y <= y(130):   # Purchase generator 1
                 o.generator1.buy()
-            elif x(15) <= mouse_x <= x(200) and y(150) <= mouse_y <= y(180):   #Purchase generator 2
+            elif x(15) <= mouse_x <= x(200) and y(150) <= mouse_y <= y(180):   # Purchase generator 2
                 o.generator2.buy()
             elif x(15) <= mouse_x <= x(95) and y(670) <= mouse_y <= y(700):    # "Shop" button
                 self.engine.Transition.next_scene = shop_scene(self.engine)
@@ -125,10 +125,11 @@ class main_scene(scene):
 class shop_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
-        self.background = BLACK
+        self.background = BLACK  # Background of scene 
     def draw(self): # Drawing of shop scene
         screen = self.engine.surface
         screen.fill(self.background)
+        # Drawing "Return" button
         pygame.draw.rect(screen, (0, 128, 0), (x(15), y(670), x(90), y(30)))
         draw_text(screen, "Return", x(20), y(670))
     def on_event(self, event): # Functionality (clicking) of shop scene

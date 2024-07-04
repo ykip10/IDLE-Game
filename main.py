@@ -1,4 +1,5 @@
-import pygame, sys, settings, objects
+import pygame, sys, settings
+from objects import Resource, Generator
 import numpy as np 
 
 pygame.init()
@@ -29,13 +30,13 @@ def y(y):
 
 
 #Resource Types
-money = objects.Resource("Money", 1)                            #Standard resource to buy upgrades
-gems = objects.Resource("Gems", 0)                              #Rare & Premium currency
+money = Resource("Money", 1)                            #Standard resource to buy upgrades
+gems = Resource("Gems", 0)                              #Rare & Premium currency
 
 #Resource Generator                                           
-generator1 = objects.Generator("generator1", money, 1,10)          #tier 1 generator
-generator2 = objects.Generator("generator2", money, 5,100)          #tier 2 generator
-generator3 = objects.Generator("generator3", money, 20,1000)         #tier 3 generator
+generator1 = Generator("generator1", money, 1,10)          #tier 1 generator
+generator2 = Generator("generator2", money, 5,100)          #tier 2 generator
+generator3 = Generator("generator3", money, 20,1000)         #tier 3 generator
       
 # Font
 font = pygame.font.Font(None, 36)
@@ -45,8 +46,8 @@ def draw_text(surface, text, x, y):                     #surface = screen it dra
     text_surface = font.render(text, True, WHITE)       
     surface.blit(text_surface, (x, y))
 
-def buy(object_name, resource):
-    if object_name.
+#   def buy(object_name, resource):
+#       if object_name.
 
 # Changes scenes to main screen 
 def show_mainscreen():
@@ -102,9 +103,9 @@ while run:
             mouse_x, mouse_y = event.pos
 
             # Clicking for resources 
-            if x(600) <= mouse_x <= x(width) and y(0) <= mouse_y <= y(height):
-                for i in range(objects.Resource.id_no):                                      
-                    objects.Resource.get_resource(i).add(objects.Resource.get_resource(i).click_rate)
+            if x(600) <= mouse_x <= x(settings.width) and y(0) <= mouse_y <= y(settings.height):
+                for i in range(Resource.id_no):                                      
+                    Resource.get_resource(i).add(Resource.get_resource(i).click_rate)
             # Buy Generator Buttons
             elif x(15) <= mouse_x <= x(200) and y(100) <= mouse_y <= y(130):      #Purchase generator 1
                 generator1.buy()
@@ -118,8 +119,8 @@ while run:
     total_rate = 0
 
     for i in range(Generator.id_no):                                      
-        objects.Generator.get_gen(i).update()
-        total_rate += objects.Generator.get_gen(i).rate
+        Generator.get_gen(i).update()
+        total_rate += Generator.get_gen(i).rate
 
     #Fill screen with black
     screen.fill(BLACK)

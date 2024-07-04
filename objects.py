@@ -1,5 +1,4 @@
 import pygame
-import main 
 # Resources Class
 class Resource:
     id_no = 0
@@ -52,7 +51,7 @@ class Generator:
 
     def buy(self):
         if self.resource.purchasable(self.cost):                            #checks if player can purchase generator
-            main.money.amount -= self.cost                            #deducts cost if player can purchase generator
+            self.resource.amount -= self.cost                            #deducts cost if player can purchase generator
             self.rate += self.base_rate                  #increases production of generator by the rate increase ##
 
     def get_gen(id_number):

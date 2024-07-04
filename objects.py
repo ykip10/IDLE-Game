@@ -1,4 +1,5 @@
 import pygame
+
 # Resources Class
 class Resource:
     id_no = 0
@@ -7,7 +8,7 @@ class Resource:
     def __init__(self, name, click_rate):
         self.name = name                                # Name of Resource
         self.amount = 0                                 # Resource Amount
-        self.click_rate = click_rate
+        self.click_rate = click_rate        
         self.id = Resource.id_no
         Resource.id_no += 1
         Resource.id_list.append(self.id)
@@ -57,4 +58,11 @@ class Generator:
     def get_gen(id_number):
         return Generator.id_to_generator.get(id_number)
 
-        
+# Resources
+money = Resource("Money", 1)   
+gems = Resource("Gems", 0)  
+
+# Resource Generators                                           
+generator1 = Generator("generator1", money, 1,10)            # tier 1 generator
+generator2 = Generator("generator2", money, 5,100)           # tier 2 generator
+generator3 = Generator("generator3", money, 20,1000)         # tier 3 generator     

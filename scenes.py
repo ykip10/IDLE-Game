@@ -46,7 +46,7 @@ def in_bounds(text, mouse_x, mouse_y):
     Returns a boolean. Checks if the mouse is inside the bounds of the button 
     """
     return rect_coords[text][0] <= mouse_x <= rect_coords[text][0] + rect_coords[text][2] and rect_coords[text][1] <= mouse_y <= rect_coords[text][1] + rect_coords[text][3]
-    
+
 
 class Transition:
     def __init__(self):
@@ -116,20 +116,12 @@ class main_scene(scene):
         # Clicking area 
         pygame.draw.rect(screen, (0, 128, 0), (xs(600), ys(0), xs(720), ys(720)))     
 
-        # Generators information
-        draw_button(screen, "Buy Generator 1", 20, 100)
-        draw_text(screen, '+' + str(o.generator1.base_rate) + ' g/s', xs(225), ys(100))
-        draw_text(screen, 'Current: ' + str(o.generator1.rate) + 'g/s', xs(315), ys(100))
-        draw_button(screen, "Buy Generator 2", 20, 150)
-        draw_text(screen, '+' + str(o.generator2.base_rate) + ' g/s', xs(225),  ys(150))
-        draw_text(screen, 'Current: ' + str(o.generator2.rate) + 'g/s', xs(315), ys(150))
-
         # Shop button
         draw_button(screen, "Shop", 20, 670)
 
         # Settings button
         draw_button(screen, "Settings", 110, 670)
-
+        
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
@@ -138,16 +130,11 @@ class main_scene(scene):
                 for i in range(o.Resource.id_no):                                      
                     o.Resource.get_resource(i).add(o.Resource.get_resource(i).click_rate)
             # Buy Generator Buttons
-            elif in_bounds('Buy Generator 1', mouse_x, mouse_y):   # Purchase generator 1
-                o.generator1.buy()
-            elif in_bounds('Buy Generator 2', mouse_x, mouse_y):   # Purchase generator 2
-                o.generator2.buy()
             elif in_bounds('Shop', mouse_x, mouse_y):    # "Shop" button
                 self.engine.Transition.next_scene = shop_scene(self.engine)
             elif in_bounds('Settings', mouse_x, mouse_y):
                 self.engine.Transition.next_scene = settings_scene(self.engine)
             
-
 
 class shop_scene(scene):
     def __init__(self, engine):
@@ -156,13 +143,40 @@ class shop_scene(scene):
     def draw(self): # Drawing of shop scene
         screen = self.engine.surface
         screen.fill(self.background)
+
+        draw_text(screen, str(o.gold), xs(10), ys(10))                            # Current Resource Amount
+        draw_text(screen, str(o.gems), xs(200), ys(10))                           # Gem count
+
         # Drawing "Return" button
         draw_button(screen, "Return",  20, 670)
+        
+        # Drawing Upgrade buttons/text 
+        draw_text(screen, "Generators", 10, 50)
+        draw_text(screen, "Click Upgrades", 650, 50)
+
+        draw_button(screen, "Buy Generator 1", 20, 90)
+        draw_text(screen, '+' + str(o.generator1.base_rate) + ' g/s', xs(225), ys(90))
+        draw_text(screen, 'Current: ' + str(o.generator1.rate) + 'g/s', xs(315), ys(90))
+
+        draw_button(screen, "Buy Generator 2", 20, 140)
+        draw_text(screen, '+' + str(o.generator2.base_rate) + ' g/s', xs(225),  ys(140))
+        draw_text(screen, 'Current: ' + str(o.generator2.rate) + 'g/s', xs(315), ys(140))
+
+        draw_button(screen, "Buy Clicker 1", 650, 90)
+        draw_text(screen, '+' + str(o.clicker1.base_rate) + ' g/click', xs(815),  ys(90))
+        draw_text(screen, 'Current: ' + str(o.clicker1.rate) + 'g/click', xs(940), ys(90))
+
     def on_event(self, event): # Functionality (clicking) of shop scene
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             if in_bounds('Return', mouse_x, mouse_y): # "Return" button
                 self.engine.Transition.next_scene = main_scene(self.engine) 
+            elif in_bounds("Buy Clicker 1", mouse_x, mouse_y):
+                o.clicker1.buy()
+            elif in_bounds('Buy Generator 1', mouse_x, mouse_y):   # Purchase generator 1
+                o.generator1.buy()
+            elif in_bounds('Buy Generator 2', mouse_x, mouse_y):   # Purchase generator 2
+                o.generator2.buy()
 
 
 class settings_scene(scene):

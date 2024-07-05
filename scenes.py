@@ -33,9 +33,9 @@ def draw_button(surface, text, x, y, color = GREEN):
     """
     Draws a button (text + rectangle). (x, y) represent coordinates of start of TEXT. Use this if what you want to draw is a button.
     """
-    text_surface = settings.font.render(text, True, WHITE)
-    text_rect = text_surface.get_rect()
-    rect_coords[text] = (xs(x-5), ys(y), xs(text_rect.width + 10), ys(text_rect.height)) # 5, 10 are magic numbers 
+    text_surface = settings.font.render(text, True, WHITE) # Turn text into a surface
+    text_rect = text_surface.get_rect() # Find rectangle of the surface 
+    rect_coords[text] = (xs(x-5), ys(y), xs(text_rect.width + 10), ys(text_rect.height)) # Map the text label to the corresponding rectangles coordinates 
     pygame.draw.rect(surface, color, rect_coords[text])  # .draw.rect takes arguments (surface, RGB, (x1, y1, width, height))
     
     draw_text(surface, text, xs(x), ys(y))
@@ -151,7 +151,7 @@ class shop_scene(scene):
         draw_button(screen, "Return",  20, 670)
         
         # Drawing Upgrade buttons/text 
-        draw_text(screen, "Generators", 10, 50)
+        draw_text(screen, "Generators", 20, 50)
         draw_text(screen, "Click Upgrades", 650, 50)
 
         draw_button(screen, "Buy Generator 1", 20, 90)
@@ -165,6 +165,9 @@ class shop_scene(scene):
         draw_button(screen, "Buy Clicker 1", 650, 90)
         draw_text(screen, '+' + str(o.clicker1.base_rate) + ' g/click', xs(815),  ys(90))
         draw_text(screen, 'Current: ' + str(o.clicker1.rate) + 'g/click', xs(940), ys(90))
+        draw_button(screen, "Buy Clicker 2", 650, 140)
+        draw_text(screen, '+' + str(o.clicker2.base_rate) + ' g/click', xs(815),  ys(140))
+        draw_text(screen, 'Current: ' + str(o.clicker2.rate) + 'g/click', xs(940), ys(140))
 
     def on_event(self, event): # Functionality (clicking) of shop scene
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -173,6 +176,8 @@ class shop_scene(scene):
                 self.engine.Transition.next_scene = main_scene(self.engine) 
             elif in_bounds("Buy Clicker 1", mouse_x, mouse_y):
                 o.clicker1.buy()
+            elif in_bounds("Buy Clicker 2", mouse_x, mouse_y):
+                o.clicker2.buy()
             elif in_bounds('Buy Generator 1', mouse_x, mouse_y):   # Purchase generator 1
                 o.generator1.buy()
             elif in_bounds('Buy Generator 2', mouse_x, mouse_y):   # Purchase generator 2

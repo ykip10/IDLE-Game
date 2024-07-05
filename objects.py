@@ -86,7 +86,7 @@ class Clicking(Upgrade):
         Clicking.id_to_clicker.update({self.id:self})
     def apply_effect(self):
         self.rate += self.base_rate
-        self.resource.click_rate += self.rate
+        self.resource.click_rate += self.base_rate
 
     def buy(self):
         super().buy()

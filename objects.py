@@ -106,3 +106,9 @@ generator3 = Generator("generator3", gold, 20, 1000)         # tier 3 generator
 # Clicking upgrades 
 clicker1 = Clicking("clicker1", gold, 1, 10)
 clicker2 = Clicking("clicker2", gold, 5, 100)
+
+class Enemy:
+    def __init__(self, name, hp, atk):
+        self.name = name 
+        self.hp = hp
+        self.atk = atk

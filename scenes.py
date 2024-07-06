@@ -80,7 +80,7 @@ class DisplayEngine:
 
             for i in range(o.Generator.id_no):
                 o.Generator.get_gen(i).update() # Update money 
-
+            
             self.Transition.current.draw() # Draw the current scene 
             pygame.display.flip() # Update Display 
 
@@ -103,6 +103,8 @@ class main_scene(scene):
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
         screen.fill(self.background)
+
+        pygame.display.set_caption('Main')
 
         total_rate = 0
         for i in range(o.Generator.id_no):
@@ -144,6 +146,8 @@ class shop_scene(scene):
     def draw(self): # Draw SHOP scene here 
         screen = self.engine.surface
         screen.fill(self.background)
+
+        pygame.display.set_caption('Shop')
 
         draw_text(screen, str(o.gold), 10, 10)                            # Current Resource Amount
         draw_text(screen, str(o.gems), 200, 10)                           # Gem count
@@ -189,6 +193,7 @@ class settings_scene(scene):
         super().__init__(engine)
         self.background = BLACK  # Background of scene 
     def draw(self): # Drawing of shop scene
+        pygame.display.set_caption('Settings')
         screen = self.engine.surface
         screen.fill(self.background)
         # Drawing "Return" button

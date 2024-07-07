@@ -58,7 +58,7 @@ class Stats:
         jerk = 0
         if level >= 10:
             jerk = math.sqrt(level)
-        self.combat_bar = Combat_Bar(10, 0, round(math.log(2 + level, settings.HP_growth)), jerk)
+        self.combat_bar = Combat_Bar(10, 0, 0.2 * round(math.log(1 + level, settings.HP_growth)), jerk)
 
 class Mob:
     def __init__(self, sprite, name, level):

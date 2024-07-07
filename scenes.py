@@ -101,7 +101,7 @@ class main_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
         self.background = BLACK # Background of scene 
-        self.combat_bar = o.Combat_Bar(self.engine.surface, 10, 0, 10, 0, GREEN)
+        self.combat_bar = o.Combat_Bar(self.engine.surface, 10, 0, 10, 0, (51, 255, 255))
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
         screen.fill(self.background)

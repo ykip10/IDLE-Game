@@ -133,7 +133,11 @@ class Combat_Bar:
         pygame.draw.rect(self.surface, scenes.WHITE, (x, settings.y_bar - 10, self.width, settings.bar_height + 20))
 
     def update(self):
-        if self.x >= settings.x_bar + (settings.bar_width / 2):
+        if self.x <= settings.x_bar + (settings.bar_width / 2):
+            self.x += self.speed
+            self.speed += self.acceleration
+            self.acceleration += self.jerk
+        elif self.x >= settings.x_bar + (settings.bar_width / 2):
             self.x += self.speed 
             self.speed -= self.acceleration
             self.acceleration -= self.jerk
@@ -145,10 +149,6 @@ class Combat_Bar:
             self.x += self.speed
             self.speed += self.acceleration
             self.acceleration += self.jerk 
-        elif self.x <= settings.x_bar + (settings.bar_width / 2):
-            self.x += self.speed
-            self.speed += self.acceleration
-            self.acceleration -= self.jerk
         elif self.x <= settings.x_bar: 
             self.speed = -self.speed
             self.acceleration = -self.acceleration

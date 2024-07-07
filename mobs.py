@@ -2,12 +2,13 @@ import pygame, settings, scenes, math, numpy as np
 
 # Combat stuff 
 class Combat_Bar: 
-    def __init__(self, width, speed, acceleration, jerk):
+    def __init__(self, width, ini_speed, acceleration, jerk):
         """ Speed refers to the initial speed of the combat indicator, acceleration refers to the acceleration of the combat indicator, 
         colour refers to the colour of the bar. 
         """
         self.width = width
-        self.speed = speed # Speed of combat indicator (pixels/s)
+        self.ini_speed = ini_speed
+        self.speed = ini_speed # Speed of combat indicator (pixels/s)
         self.acceleration = acceleration # Acceleration of combat indicator (pixels/s^2)
         self.jerk = jerk # d^3x/dt^3
         self.x = settings.x_bar # Starting x position of combat indicator 
@@ -35,16 +36,16 @@ class Combat_Bar:
             self.speed += self.acceleration
             self.acceleration -= self.jerk
         elif self.x >= settings.x_bar + settings.bar_width - self.width: # Past right border
-            self.x = settings.x_bar + settings.bar_width - self.width 
-            self.speed = -abs(self.speed)
+            self.x += self.speed 
+            self.speed = -abs(self.ini_speed)
             self.speed += self.acceleration
             self.acceleration -= self.jerk 
-        elif self.x <= settings.x_bar: # Past left border 
-            self.x = settings.x_bar
-            self.speed = abs(self.speed) 
+        elif self.x <= settings.x_bar: # Past left border
+            self.x += self.speed 
+            self.speed = abs(self.ini_speed) 
             self.speed += self.acceleration
             self.acceleration += self.jerk 
-        print(self.speed)
+        print(self.speed, self.acceleration)
         self.draw(surface)
         
 

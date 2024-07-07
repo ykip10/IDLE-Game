@@ -1,4 +1,5 @@
-import pygame, scenes, settings
+import pygame, scenes, settings, math
+import numpy as np
 
 # Resources Class
 class Resource:
@@ -107,66 +108,3 @@ generator3 = Generator("generator3", gold, 20, 1000)         # tier 3 generator
 clicker1 = Clicking("clicker1", gold, 1, 10)
 clicker2 = Clicking("clicker2", gold, 5, 100)
 
-
-# Combat stuff 
-class Combat_Bar: 
-    def __init__(self, surface, width, speed, acceleration, jerk, colour):
-        """ Speed refers to the initial speed of the combat indicator, acceleration refers to the acceleration of the combat indicator, 
-        colour refers to the colour of the bar. 
-        """
-        self.surface = surface
-        self.width = width
-        self.speed = speed # Speed of combat indicator (pixels/s)
-        self.acceleration = acceleration # Acceleration of combat indicator (pixels/s^2)
-        self.jerk = jerk # d^3x/dt^3
-        self.x = settings.x_bar # Starting x position of combat indicator 
-
-        self.bar = pygame.Surface((settings.bar_width, settings.bar_height))
-        self.bar.fill(colour)
-        
-        
-    def draw(self, x):
-        """ x is the x-coordinate of the combat indicator. width, height refer to the width  
-        sliding combat INDICATOR. Draws the bar + combat indicator. 
-        """
-        self.surface.blit(self.bar, dest = (settings.x_bar, settings.y_bar))
-        pygame.draw.rect(self.surface, scenes.WHITE, (x, settings.y_bar - 10, self.width, settings.bar_height + 20))
-
-    def update(self):
-        if self.x <= settings.x_bar + (settings.bar_width / 2):
-            self.x += self.speed
-            self.speed += self.acceleration
-            self.acceleration += self.jerk
-        elif self.x >= settings.x_bar + (settings.bar_width / 2):
-            self.x += self.speed 
-            self.speed -= self.acceleration
-            self.acceleration -= self.jerk
-        elif self.x >= settings.x_bar + settings.bar_width:
-            self.speed = -self.speed
-            self.acceleration = -self.acceleration
-            self.jerk = -self.jerk
-
-            self.x += self.speed
-            self.speed += self.acceleration
-            self.acceleration += self.jerk 
-        elif self.x <= settings.x_bar: 
-            self.speed = -self.speed
-            self.acceleration = -self.acceleration
-            self.jerk = -self.jerk
-
-            self.x += self.speed
-            self.speed += self.acceleration
-            self.acceleration += self.jerk 
-        self.draw(self.x)
-        
-
-
-#class Mob:
-#    def __init__(self, sprite, name, hp, atk, level, combat_bar):
- #       self.sprite = sprite
-  #      self.name = name 
-#        self.hp = hp
-   #     self.atk = atk
-  #      self.combat_bar = Combat_bar()
-    
-    

@@ -24,12 +24,14 @@ class Combat_Bar:
         pygame.draw.rect(surface, settings.WHITE, (self.x, settings.y_bar - 10, self.width, settings.bar_height + 20))
 
     def update(self, surface):
-        if settings.x_bar <= self.x <= settings.x_bar + (settings.bar_width / 2): # In first half 
+        if settings.x_bar <= self.x <= settings.x_bar + (settings.bar_width - self.width ) / 2: # In first half 
             self.x += self.speed
             self.speed += self.acceleration
+            self.acceleration = abs(self.acceleration)
             self.acceleration += self.jerk
-        elif settings.x_bar + (settings.bar_width / 2) <= self.x  <= settings.x_bar + settings.bar_width - self.width: # In second half 
+        elif settings.x_bar + (settings.bar_width - self.width ) / 2 <= self.x  <= settings.x_bar + settings.bar_width - self.width: # In second half 
             self.x += self.speed
+            self.acceleration = -abs(self.acceleration)
             self.speed += self.acceleration
             self.acceleration -= self.jerk
         elif self.x >= settings.x_bar + settings.bar_width - self.width: # Past right border
@@ -58,7 +60,7 @@ class Stats:
         jerk = 0
         if level >= 10:
             jerk = math.sqrt(level)
-        self.combat_bar = Combat_Bar(10, 0, 0.2 * round(math.log(1 + level, settings.HP_growth)), jerk)
+        self.combat_bar = Combat_Bar(10, 0, settings.BAR_DIFFICULTY * round(math.log(1 + level, settings.BAR_SPEED_GROWTH)), jerk)
 
 class Mob:
     def __init__(self, sprite, name, level):

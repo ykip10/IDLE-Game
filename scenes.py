@@ -5,6 +5,7 @@ from collections import defaultdict
 # Colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+LIGHT_BLUE = (51, 255, 255)
 GREEN = (0, 128, 0)
 
 rect_coords = defaultdict() # Stores rectangle coordinates for each labelled rectangle 
@@ -101,7 +102,7 @@ class main_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
         self.background = BLACK # Background of scene 
-        self.combat_bar = o.Combat_Bar(self.engine.surface, 10, 0, 10, 0, (51, 255, 255))
+        self.combat_bar = o.Combat_Bar(self.engine.surface, 10, 0, 10, 0, LIGHT_BLUE)
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
         screen.fill(self.background)

@@ -11,7 +11,7 @@ rect_coords = defaultdict() # Stores rectangle coordinates for each labelled rec
 
 def x_scaled(x):
     """
-    Returns x-coordinate scaled to custom resolutions
+    Returns x-  coordinate scaled to custom resolutions
     """
     return settings.width * x / settings.NATIVE_WIDTH
 
@@ -80,8 +80,9 @@ class DisplayEngine:
 
             for i in range(o.Generator.id_no):
                 o.Generator.get_gen(i).update() # Update money 
-            
+
             self.Transition.current.draw() # Draw the current scene 
+            self.clock.tick(settings.fps)
             pygame.display.flip() # Update Display 
 
     def run(self, state):
@@ -100,6 +101,7 @@ class main_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
         self.background = BLACK # Background of scene 
+        self.combat_bar = o.Combat_Bar(self.engine.surface, 10, 0, 10, 0, GREEN)
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
         screen.fill(self.background)
@@ -124,6 +126,8 @@ class main_scene(scene):
 
         # Settings button
         draw_button(screen, "Settings", 110, 670)
+
+        self.combat_bar.update()
         
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -137,6 +141,7 @@ class main_scene(scene):
                 self.engine.Transition.next_scene = shop_scene(self.engine)
             elif in_bounds('Settings', mouse_x, mouse_y):
                 self.engine.Transition.next_scene = settings_scene(self.engine)
+        
             
 
 class shop_scene(scene):

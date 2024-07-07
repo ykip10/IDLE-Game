@@ -28,22 +28,21 @@ class Combat_Bar:
             self.x += self.speed
             self.speed += self.acceleration
             self.acceleration += self.jerk
-        elif settings.x_bar + (settings.bar_width / 2) <= self.x  <= settings.x_bar + settings.bar_width: # In second half 
-            self.x += self.speed 
-            self.speed -= self.acceleration
-            self.acceleration -= self.jerk
-        elif self.x >= settings.x_bar + settings.bar_width: # Past right border
-            self.x = settings.x_bar + settings.bar_width
-            self.speed = -abs(self.speed)
+        elif settings.x_bar + (settings.bar_width / 2) <= self.x  <= settings.x_bar + settings.bar_width - self.width: # In second half 
             self.x += self.speed
-            self.speed -= self.acceleration
+            self.speed += self.acceleration
+            self.acceleration -= self.jerk
+        elif self.x >= settings.x_bar + settings.bar_width - self.width: # Past right border
+            self.x = settings.x_bar + settings.bar_width - self.width 
+            self.speed = -abs(self.speed)
+            self.speed += self.acceleration
             self.acceleration -= self.jerk 
         elif self.x <= settings.x_bar: # Past left border 
             self.x = settings.x_bar
             self.speed = abs(self.speed) 
-            self.x += self.speed
             self.speed += self.acceleration
             self.acceleration += self.jerk 
+        print(self.speed)
         self.draw(surface)
         
 
@@ -59,7 +58,7 @@ class Stats:
         jerk = 0
         if level >= 10:
             jerk = math.sqrt(level)
-        self.combat_bar = Combat_Bar(10, 0, round(10*math.log(2 + level, settings.HP_growth)), jerk)
+        self.combat_bar = Combat_Bar(10, 0, round(math.log(2 + level, settings.HP_growth)), jerk)
 
 class Mob:
     def __init__(self, sprite, name, level):

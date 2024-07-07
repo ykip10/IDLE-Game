@@ -143,7 +143,8 @@ class main_scene(scene):
         draw_button(screen, "Shop", 20, 670)
 
         # Settings button
-        
+        draw_button(screen, "Settings", 100, 670)
+
         self.curr_mob.draw(screen, 210, 340)
         self.curr_mob.stats.combat_bar.update(screen)
         #self.combat_bar = r.Combat_Bar(10, 0, 5, 0)

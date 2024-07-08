@@ -39,3 +39,5 @@ hp_bar_height = 20
 
 font = pygame.font.Font(None, 36) # font 
 
+#User Preferences
+show_scientific_notation = True

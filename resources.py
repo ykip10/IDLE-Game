@@ -1,5 +1,7 @@
 import pygame, scenes, settings, math
 import numpy as np
+import utility
+
 
 # Resources Class
 class Resource:
@@ -18,14 +20,19 @@ class Resource:
     def add(self, amount):
         self.amount += amount                           # Increase resource value by "amount"
 
-    def __str__(self):
-        return f"{self.name}: {self.amount}"            # Returns resource name and amount
-    
+    def __str__(self):                                  # Returns resource name and amount
+        if settings.show_scientific_notation == True:   # Returns resource amount in scientific notation
+            return f"{self.name}: {utility.convert_scientific(self.amount)}"  
+        elif settings.show_scientific_notation == False:
+            return f"{self.name}: {self.amount}"        #Returns resource amoount as float/int value
+
     def purchasable(self,price):
         return self.amount >= price
 
     def get_resource(id_number):
         return Resource.id_to_resource.get(id_number)
+    
+            
 
 class Upgrade:
     def __init__(self, name, resource, cost):
@@ -96,7 +103,7 @@ class Clicking(Upgrade):
         return Upgrade.id_to_clicker.get(id_no)
 
 # Resources
-gold = Resource("Gold", 1)   
+gold = Resource("Gold", 1)
 gems = Resource("Gems", 0)  
 
 # Generator upgrades                                           

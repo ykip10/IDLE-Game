@@ -1,5 +1,6 @@
 import pygame, sys, settings, mobs as mobs
 import resources as r
+import utility as u
 from collections import defaultdict
 
 pygame.init()
@@ -226,10 +227,23 @@ class settings_scene(scene):
         pygame.display.set_caption('Settings')
         screen = self.engine.surface
         screen.fill(self.background)
+
+        #Scientific Notation Stuff
+        pygame.draw.rect(screen, settings.WHITE, (20, 55, 20, 20), 2)   # Draws check box corresponding to scientific notation
+        if settings.show_scientific_notation == True:
+            draw_button(screen, f"Toggle Scientific Notation: {settings.show_scientific_notation} ", 50, 50) # Draws Scientific Notation Button as green
+            pygame.draw.line(screen, settings.WHITE, (20,75), (40,55), 2) #ticks box if S.N is toggled
+        elif settings.show_scientific_notation == False:
+            draw_button(screen, f"Toggle Scientific Notation: {settings.show_scientific_notation} ", 50, 50, settings.RED) # Draws Scientific Notation Button as red
+            
         # Drawing "Return" button
         draw_button(screen, "Return",  20, 670)
-    def on_event(self, event): # Functionality (clicking) of shop scene
+    #Events    
+    def on_event(self, event): # Functionality (clicking) of settings scene
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             if in_bounds('Return', mouse_x, mouse_y): # "Return" button
-                self.engine.Transition.next_scene = main_scene(self.engine) 
+                self.engine.Transition.next_scene = main_scene(self.engine)
+            elif in_bounds(f"Toggle Scientific Notation: {settings.show_scientific_notation} ", mouse_x, mouse_y): # "Scientific Notation Toggle Button"
+                settings.show_scientific_notation = not settings.show_scientific_notation
+            

@@ -11,6 +11,7 @@ DARK_BLUE = (0, 102, 204)
 GREEN = (0, 128, 0)
 DARK_GREEN = (0, 51, 0)
 RED = (204, 0, 0)
+YELLOW = (255, 255, 0)
 
 MAIN_BACKGROUND = GREY 
 
@@ -29,10 +30,7 @@ fps = 60
 
 
 # Combat 
-bar_width = 250
-bar_height = 50
-x_bar = 150
-y_bar = 500
+
 
 hp_bar_width = 200
 hp_bar_height = 20

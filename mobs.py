@@ -31,10 +31,18 @@ class Bar: # Only supports 1 dimensional motion in x or y direction
         self.acceleration = ini_acceleration # Acceleration of combat indicator (pixels/s^2)
         self.jerk = jerk # d^3x/dt^3
 
-        self.dest = () # Destination of top left of bar
+        # Dimensions of bar 
+        self.bar_width = 0
+        self.bar_height = 0
+
+        # Coordinates of top left of bar
+        self.x_bar = 0
+        self.y_bar = 0
+
         self.bar = None # Bar to be drawn 
+
     def draw(self, surface): 
-        surface.blit(self.bar, dest = self.dest) # Draws the bar 
+        surface.blit(self.bar, dest = (self.x_bar, self.y_bar)) # Draws the bar 
 
         # Other drawings need to be specified in the subclass
     def update(self, surface): 
@@ -44,52 +52,69 @@ class Bar: # Only supports 1 dimensional motion in x or y direction
 
 class Combat_Bar(Bar): 
     def __init__(self, goal_width, width, ini_speed, ini_acceleration, jerk):
-        """ Speed refers to the initial speed of the combat indicator, acceleration refers to the acceleration of the combat indicator, 
-        colour refers to the colour of the bar. 
+        """ 
+        goal_width: width of goal indicator
+        width: width of combat indicator
+        ini_speed: initial speed of combat indicator
+        ini_acceleration: initial acceleration of combat indicator
+        jerk: jerk of combat indicator 
         """
+        
         super().__init__(ini_speed, ini_acceleration, jerk)
+        
+        # Dimensions of bar 
+        self.bar_width = 250
+        self.bar_height = 50
+
+        # Coordinates of bar
+        self.x_bar = 150
+        self.y_bar = 500
 
         self.width = width 
-        self.x = settings.x_bar # Starting x position of combat indicator
-        
-        self.bar = pygame.Surface((settings.bar_width, settings.bar_height))
+        self.x = self.x_bar # Starting x position of combat indicator
+
+        self.bar = pygame.Surface((self.bar_width, self.bar_height))
         self.bar.fill(settings.DARK_BLUE)
-        self.dest = (settings.x_bar, settings.y_bar)
+        self.dest = (self.x_bar, self.y_bar)
         self.goal_width = goal_width
-        
+
+        # Controls the minimum distance from either edge the goal_bar is allowed to spawn 
+        self.min_distance = 50
         self.offset = np.random.normal(-5, 20)
 
-        self.goal_bar = (settings.x_bar + (settings.bar_width - self.width) / 2 - self.offset, settings.y_bar - 10, self.goal_width, settings.bar_height + 20)
+        self.goal_bar = (self.x_bar + (self.bar_width - self.width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
         self.goal = False
+
         
         
     def draw(self, surface):
-        """ x is the x-coordinate of the combat indicator. width, height refer to the width  
-        sliding combat INDICATOR. Draws the bar + combat indicator. 
+        """ Draws the combat bar.
         """
         super().draw(surface)
         
         # Drawing of goal bar and combat indicator 
         pygame.draw.rect(surface, settings.GREEN, self.goal_bar)
-        pygame.draw.rect(surface, settings.WHITE, (self.x, settings.y_bar - 10, self.width, settings.bar_height + 20))
+        pygame.draw.rect(surface, settings.WHITE, (self.x, self.y_bar - 10, self.width, self.bar_height + 20))
 
     def update(self, surface):
-        if settings.x_bar <= self.x <= settings.x_bar + (settings.bar_width - self.width ) / 2: # In first half 
+        """ Updates the position of the combat bar and checks if the combat indicator is in the bounds of the goal indicator. 
+        """
+        if self.x_bar <= self.x <= self.x_bar + (self.bar_width - self.width ) / 2: # In first half 
             self.x += self.speed
             self.speed += self.acceleration
             self.acceleration = abs(self.acceleration)
             self.acceleration += self.jerk
-        elif settings.x_bar + (settings.bar_width - self.width ) / 2 <= self.x  <= settings.x_bar + settings.bar_width - self.width: # In second half 
+        elif self.x_bar + (self.bar_width - self.width ) / 2 <= self.x  <= self.x_bar + self.bar_width - self.width: # In second half 
             self.x += self.speed
             self.acceleration = -abs(self.acceleration)
             self.speed += self.acceleration
             self.acceleration -= self.jerk
-        elif self.x >= settings.x_bar + settings.bar_width - self.width: # Past right border
+        elif self.x >= self.x_bar + self.bar_width - self.width: # Past right border
             self.x += self.speed 
             self.speed = -abs(self.ini_speed)
             self.speed += self.acceleration
             self.acceleration -= self.jerk 
-        elif self.x <= settings.x_bar: # Past left border
+        elif self.x <= self.x_bar: # Past left border
             self.x += self.speed    
             self.speed = abs(self.ini_speed) 
             self.speed += self.acceleration
@@ -97,26 +122,53 @@ class Combat_Bar(Bar):
 
         # Check if combat indicator is in goal bounds 
         self.goal = (self.goal_bar[0] <= self.x <= self.goal_bar[0] + self.goal_bar[2]) and (self.goal_bar[0] <= self.x + self.width <= self.goal_bar[0] + self.goal_bar[2])  
+
         self.draw(surface)
+
     def reset(self):
         """ Resets comabt indicator to starting position"""
-        self.x = settings.x_bar
+        self.x = self.x_bar
         self.speed = self.ini_speed
         self.acceleration = self.ini_acceleration
-        self.offset = np.random.normal(-5, 20) 
+        #         <-goal_w->
+        # ----------  ---  ------------  |     |
+        # |          |   |            |  | self.bar_height
+        # ----------  ---  ------------  |     |
+        # <-------self.bar_width------>
+        #
+        
+        self.offset = np.random.uniform(-(self.bar_width - self.width) / 2 + self.min_distance, (self.bar_width - self.width) / 2 - self.min_distance) 
+        self.goal_bar = (self.x_bar + (self.bar_width - self.width - self.goal_width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
 
 
 class Work_Bar(Bar):
     def __init__(self, ini_speed, ini_acceleration, jerk):
         super().__init__(ini_speed, ini_acceleration, jerk)
-        self.x = settings.x_bar # Starting x position of combat indicator
-        self.dest = (500, 300)
-        self.bar = pygame.Surface((settings.bar_height, settings.bar_width))
-        self.bar.fill(settings.DARK_BLUE)
+
+        # Dimensions of the bar
+        self.bar_width = Combat_Bar.bar_height
+        self.bar_height = Combat_Bar.bar_width
+
+        # Coordinates of the bar
+        self.x_bar = 500
+        self.y_bar = 300
+
+        self.y = self.x_bar + self.bar_width # Starting y position of black box 
+        self.bar = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))         # initalisation of gradiented meter 
+        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))   # initialisation of black box (wi)
+
+        # For logic in update method
+        self.speed = ini_speed
+        self.acceleration = ini_acceleration
+        self.jerk = jerk
+
     def draw(self, surface):
         super().draw(surface)
-    #def update(self, surface):
+        ver_gradientRect(surface, settings.YELLOW, settings.RED, self.bar) # Draw gradiented meter 
+        pygame.draw.rect(surface, settings.BLACK, self.black_box)
 
+    def update(self, surface):
+        self.y -= self.speed
 
 
 class Stats: 

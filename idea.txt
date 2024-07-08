@@ -26,3 +26,8 @@ Game Mechanics:
     and u can only fight that mob by accumulating pve xp through active play
     and if u dont start now its gonna take ages
     
+immediate todo:
+inventory list
+item drops 
+shop upgrades for combat 
+mob rotation

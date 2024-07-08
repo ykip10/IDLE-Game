@@ -1,4 +1,4 @@
-import pygame, sys, settings, mobs as mobs
+import pygame, sys, settings, mobs
 import resources as r
 from collections import defaultdict
 
@@ -59,6 +59,8 @@ def get_mob_frame(sheet, size, row, column, colour):
     frame = pygame.transform.scale(frame, (settings.MOB_HEIGHT, settings.MOB_SIZE))
     return frame
 
+def show_gold(screen):
+    draw_text(screen, str(r.gold), 10, 10) 
 
 class Transition:
     def __init__(self):
@@ -131,13 +133,12 @@ class main_scene(scene):
             total_rate += r.Generator.get_gen(i).rate
 
         # Resources info
-        draw_text(screen, str(r.gold), 10, 10)                           # Current Resource Amount
+        show_gold(screen)                                   # Current Resource Amount
         draw_text(screen, str(r.gems), 200, 10)                           # Gem count
         draw_text(screen, f'Income: {str(total_rate)}g/s', 390, 10)     # Current income 
 
-        # Clicking area 
-        pygame.draw.rect(screen, settings.DARK_GREEN, (x_scaled(600), y_scaled(0), x_scaled(720), y_scaled(720)))     
-        draw_text(screen, f'Click for {r.gold.click_rate} gold!', 850, 360)
+        # Work button
+        draw_button(screen, "Go to work", 1130, 670)
 
         # Shop button
         draw_button(screen, "Shop", 20, 670)
@@ -157,9 +158,8 @@ class main_scene(scene):
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             # Clicking for resources 
-            if x_scaled(600) <= mouse_x <=  x_scaled(settings.width) and y_scaled(0) <= mouse_y <= y_scaled(settings.height):
-                for i in range(r.Resource.id_no):                                      
-                    r.Resource.get_resource(i).add(r.Resource.get_resource(i).click_rate)
+            if in_bounds('Go to work', mouse_x, mouse_y):
+                self.engine.Transition.next_scene = working_scene(self.engine)
             # Buy Generator Buttons
             elif in_bounds('Shop', mouse_x, mouse_y):    # "Shop" button
                 self.engine.Transition.next_scene = shop_scene(self.engine)
@@ -233,3 +233,24 @@ class settings_scene(scene):
             mouse_x, mouse_y = event.pos
             if in_bounds('Return', mouse_x, mouse_y): # "Return" button
                 self.engine.Transition.next_scene = main_scene(self.engine) 
+
+class working_scene(scene):
+    def __init__(self, engine):
+        super().__init__(engine)
+        self.background = settings.MAIN_BACKGROUND
+    def draw(self): 
+        pygame.display.set_caption('Working')
+        screen = self.engine.surface
+        screen.fill(self.background)
+
+        draw_button(screen, 'Return', 20, 670)
+        show_gold(screen)
+
+        
+
+    def on_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = event.pos
+            if in_bounds('Return', mouse_x, mouse_y):
+                self.engine.Transition.next_scene = main_scene(self.engine)
+

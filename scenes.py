@@ -150,7 +150,11 @@ class main_scene(scene):
         #self.combat_bar = r.Combat_Bar(10, 0, 5, 0)
         
     def on_event(self, event): # Functionality (clicking) of main scene
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if self.curr_mob.stats.combat_bar.goal:
+                self.curr_mob.damage(2)
+                self.curr_mob.stats.combat_bar.reset()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             # Clicking for resources 
             if x_scaled(600) <= mouse_x <=  x_scaled(settings.width) and y_scaled(0) <= mouse_y <= y_scaled(settings.height):
@@ -161,6 +165,7 @@ class main_scene(scene):
                 self.engine.Transition.next_scene = shop_scene(self.engine)
             elif in_bounds('Settings', mouse_x, mouse_y):
                 self.engine.Transition.next_scene = settings_scene(self.engine)
+        
         
             
 

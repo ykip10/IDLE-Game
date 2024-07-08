@@ -1,6 +1,6 @@
-import pygame, settings, scenes, math, numpy as np
+import pygame, settings, scenes, math, random, numpy as np
 
-# https://stackoverflow.com/questions/62336555/how-to-add-color-gradient-to-rectangle-in-pygame
+# credit: https://stackoverflow.com/questions/62336555/how-to-add-color-gradient-to-rectangle-in-pygame
 def hor_gradientRect(surface, left_colour, right_colour, target_rect):
     """ Draw a horizontal-gradient filled rectangle covering <target_rect> """
     colour_rect = pygame.Surface((2, 2))                                   # tiny! 2x2 bitmap
@@ -17,6 +17,9 @@ def ver_gradientRect(surface, bottom_colour, top_colour, target_rect):
     pygame.draw.line(colour_rect, top_colour, (0, 1), (1, 1))
     colour_rect = pygame.transform.smoothscale(colour_rect, (target_rect.width, target_rect.height))
     surface.blit(colour_rect, target_rect)
+
+def get_random_seed():
+    return int(np.random.uniform(0, 1000))
 
 # Combat stuff 
 class Bar: # Only supports 1 dimensional motion in x or y direction 
@@ -52,17 +55,20 @@ class Combat_Bar(Bar):
         self.bar = pygame.Surface((settings.bar_width, settings.bar_height))
         self.bar.fill(settings.DARK_BLUE)
         self.dest = (settings.x_bar, settings.y_bar)
-
-        offset = 30 
         self.goal_width = goal_width
-        self.goal_bar = (settings.x_bar + (settings.bar_width - self.width) / 2 - offset, settings.y_bar - 10, self.goal_width, settings.bar_height + 20)
+        
+        self.offset = np.random.normal(-5, 20)
+
+        self.goal_bar = (settings.x_bar + (settings.bar_width - self.width) / 2 - self.offset, settings.y_bar - 10, self.goal_width, settings.bar_height + 20)
         self.goal = False
+        
+        
     def draw(self, surface):
         """ x is the x-coordinate of the combat indicator. width, height refer to the width  
         sliding combat INDICATOR. Draws the bar + combat indicator. 
         """
         super().draw(surface)
-
+        
         # Drawing of goal bar and combat indicator 
         pygame.draw.rect(surface, settings.GREEN, self.goal_bar)
         pygame.draw.rect(surface, settings.WHITE, (self.x, settings.y_bar - 10, self.width, settings.bar_height + 20))
@@ -92,12 +98,13 @@ class Combat_Bar(Bar):
         # Check if combat indicator is in goal bounds 
         self.goal = (self.goal_bar[0] <= self.x <= self.goal_bar[0] + self.goal_bar[2]) and (self.goal_bar[0] <= self.x + self.width <= self.goal_bar[0] + self.goal_bar[2])  
         self.draw(surface)
-
     def reset(self):
         """ Resets comabt indicator to starting position"""
         self.x = settings.x_bar
         self.speed = self.ini_speed
         self.acceleration = self.ini_acceleration
+        self.offset = np.random.normal(-5, 20) 
+
 
 class Work_Bar(Bar):
     def __init__(self, ini_speed, ini_acceleration, jerk):

@@ -2,7 +2,7 @@ import pygame, settings, scenes, math, numpy as np
 
 # Combat stuff 
 class Combat_Bar: 
-    def __init__(self, goal_width, width, ini_speed, acceleration, jerk):
+    def __init__(self, goal_width, width, ini_speed, ini_acceleration, jerk):
         """ Speed refers to the initial speed of the combat indicator, acceleration refers to the acceleration of the combat indicator, 
         colour refers to the colour of the bar. 
         """
@@ -10,21 +10,26 @@ class Combat_Bar:
         self.width = width
         self.ini_speed = ini_speed
         self.speed = ini_speed # Speed of combat indicator (pixels/s)
-        self.acceleration = acceleration # Acceleration of combat indicator (pixels/s^2)
+        self.ini_acceleration = ini_acceleration
+        self.acceleration = ini_acceleration # Acceleration of combat indicator (pixels/s^2)
         self.jerk = jerk # d^3x/dt^3
         self.x = settings.x_bar # Starting x position of combat indicator 
 
         self.bar = pygame.Surface((settings.bar_width, settings.bar_height))
         self.bar.fill(settings.DARK_BLUE)
+
+        offset = 30 
+        self.goal_bar = (settings.x_bar + (settings.bar_width - self.width) / 2 - offset, settings.y_bar - 10, self.goal_width, settings.bar_height + 20)
+        self.goal = False
         
         
     def draw(self, surface):
         """ x is the x-coordinate of the combat indicator. width, height refer to the width  
         sliding combat INDICATOR. Draws the bar + combat indicator. 
         """
-        offset = 30 
+        
         surface.blit(self.bar, dest = (settings.x_bar, settings.y_bar))
-        pygame.draw.rect(surface, settings.GREEN, (settings.x_bar + (settings.bar_width - self.width) / 2 - offset, settings.y_bar - 10, self.goal_width, settings.bar_height + 20))
+        pygame.draw.rect(surface, settings.GREEN, self.goal_bar)
         pygame.draw.rect(surface, settings.WHITE, (self.x, settings.y_bar - 10, self.width, settings.bar_height + 20))
 
     def update(self, surface):
@@ -44,12 +49,21 @@ class Combat_Bar:
             self.speed += self.acceleration
             self.acceleration -= self.jerk 
         elif self.x <= settings.x_bar: # Past left border
-            self.x += self.speed 
+            self.x += self.speed    
             self.speed = abs(self.ini_speed) 
             self.speed += self.acceleration
             self.acceleration += self.jerk 
+
+        # Check if combat indicator is in goal bounds 
+        self.goal = (self.goal_bar[0] <= self.x <= self.goal_bar[0] + self.goal_bar[2]) and (self.goal_bar[0] <= self.x + self.width <= self.goal_bar[0] + self.goal_bar[2])  
         self.draw(surface)
-        
+
+    def reset(self):
+        """ Resets comabt indicator to starting position"""
+        self.x = settings.x_bar
+        self.speed = self.ini_speed
+        self.acceleration = self.ini_acceleration
+
 
 class Stats: 
     def __init__(self, level):
@@ -63,7 +77,7 @@ class Stats:
         jerk = 0
         if level >= 10:
             jerk = math.sqrt(level)
-        self.combat_bar = Combat_Bar(20, 10, 0, settings.BAR_DIFFICULTY * round(math.log(1 + level, settings.BAR_SPEED_GROWTH)), jerk)
+        self.combat_bar = Combat_Bar(30, 10, 0, settings.BAR_DIFFICULTY * round(math.log(1 + level, settings.BAR_SPEED_GROWTH)), jerk)
 
 class Mob:
     def __init__(self, sprite, name, level):
@@ -81,6 +95,7 @@ class Mob:
         surface.blit(self.sprite, dest = (scenes.x_scaled(x), scenes.y_scaled(y)))
         scenes.draw_text(surface, f'{self.stats.level}', scenes.x_scaled(x-50), scenes.y_scaled(y-2))
         pygame.draw.rect(surface, settings.RED, (scenes.x_scaled(x-30), scenes.y_scaled(y), self.hp_bar_width, settings.hp_bar_height))
+        scenes.draw_text(surface, f'HP: {self.current_hp}/{self.stats.hp}', scenes.x_scaled(x+200), scenes.y_scaled(y))
     def damage(self, amount):
         self.current_hp -= amount
-        self.hp_bar_width *= self.current_hp / self.stats.hp
+        self.hp_bar_width = settings.hp_bar_width * self.current_hp / self.stats.hp

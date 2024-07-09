@@ -22,7 +22,8 @@ VAR_FACTOR = 10  # The lower this number, the more variation in the stats of obj
 MOB_HEIGHT = 128
 MOB_SIZE = 128
 BAR_DIFFICULTY = 0.05
-BAR_SPEED_GROWTH = math.e # Base of the logarithm 
+BAR_SPEED_GROWTH = math.e # Base of the logarithm C
+COMBAT_INDICATOR_WIDTH = 5
 
 width = 1280
 height = 720

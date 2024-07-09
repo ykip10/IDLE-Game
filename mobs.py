@@ -1,4 +1,5 @@
-import pygame, settings, scenes, math, random, numpy as np
+import pygame, settings, scenes, math, numpy as np
+import utility as u
 
 # credit: https://stackoverflow.com/questions/62336555/how-to-add-color-gradient-to-rectangle-in-pygame
 def hor_gradientRect(surface, left_colour, right_colour, target_rect):
@@ -53,7 +54,7 @@ class Bar: # Only supports 1 dimensional motion in x or y direction
 class Combat_Bar(Bar): 
     """ Contains information about the combat bar and all associated mechanics
     """
-    def __init__(self, goal_width, width, ini_speed, ini_acceleration, jerk):
+    def __init__(self, goal_width, ini_speed, ini_acceleration, jerk):
         """ 
         goal_width: width of goal indicator
         width: width of combat indicator
@@ -69,11 +70,12 @@ class Combat_Bar(Bar):
         self.bar_height = 50
 
         # Coordinates of bar
-        self.x_bar = 150
-        self.y_bar = 500
+        self.x_bar = 450
+        self.y_bar = 600
 
-        self.width = width 
+        self.width = settings.COMBAT_INDICATOR_WIDTH
         self.x = self.x_bar # Starting x position of combat indicator
+        self.combat_indicator = pygame.Rect(self.x, self.y_bar - 10, self.width, self.bar_height + 20)
 
         self.bar = pygame.Surface((self.bar_width, self.bar_height))
         self.bar.fill(settings.DARK_BLUE)
@@ -84,10 +86,9 @@ class Combat_Bar(Bar):
         self.min_distance = 50
         self.offset = np.random.normal(-5, 20)
 
-        self.goal_bar = (self.x_bar + (self.bar_width - self.width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
+        self.goal_bar = pygame.Rect(self.x_bar + (self.bar_width - self.width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
         self.goal = False
-
-        
+   
         
     def draw(self, surface):
         """ Draws the combat bar.
@@ -96,7 +97,7 @@ class Combat_Bar(Bar):
         
         # Drawing of goal bar and combat indicator 
         pygame.draw.rect(surface, settings.GREEN, self.goal_bar)
-        pygame.draw.rect(surface, settings.WHITE, (self.x, self.y_bar - 10, self.width, self.bar_height + 20))
+        pygame.draw.rect(surface, settings.WHITE, self.combat_indicator)
 
     def update(self, surface):
         """ Updates the position of the combat bar and checks if the combat indicator is in the bounds of the goal indicator. 
@@ -122,9 +123,11 @@ class Combat_Bar(Bar):
             self.speed += self.acceleration
             self.acceleration += self.jerk 
 
-        # Check if combat indicator is in goal bounds 
-        self.goal = (self.goal_bar[0] <= self.x <= self.goal_bar[0] + self.goal_bar[2]) and (self.goal_bar[0] <= self.x + self.width <= self.goal_bar[0] + self.goal_bar[2])  
+        # Update combat indicator position based on the value of x. 
+        self.combat_indicator = pygame.Rect(self.x, self.y_bar - 10, self.width, self.bar_height + 20)
 
+        # Check if combat indicator is in goal bounds 
+        self.goal = self.goal_bar.contains(self.combat_indicator) 
         self.draw(surface)
 
     def reset(self):
@@ -140,7 +143,7 @@ class Combat_Bar(Bar):
         #
         
         self.offset = np.random.uniform(-(self.bar_width - self.width) / 2 + self.min_distance, (self.bar_width - self.width) / 2 - self.min_distance) 
-        self.goal_bar = (self.x_bar + (self.bar_width - self.width - self.goal_width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
+        self.goal_bar = pygame.Rect(self.x_bar + (self.bar_width - self.width - self.goal_width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
 
 
 class Work_Bar(Bar):
@@ -220,7 +223,7 @@ class Mob_stats:
         jerk = 0
         if level >= 10:
             jerk = math.sqrt(level)
-        self.combat_bar = Combat_Bar(30, 10, 0, settings.BAR_DIFFICULTY * round(math.log(1 + level, settings.BAR_SPEED_GROWTH)), jerk)
+        self.combat_bar = Combat_Bar(30, 0, settings.BAR_DIFFICULTY * round(math.log(1 + level, settings.BAR_SPEED_GROWTH)), jerk)
 
 
 class Mob:
@@ -239,53 +242,19 @@ class Mob:
     def draw(self, surface, x, y):
         """ Draws the sprite and level of the mob. (x, y) position are coordinates of top left of sprite rectangle.  
         """
-        surface.blit(self.sprite, dest = (scenes.x_scaled(x), scenes.y_scaled(y)))
-        scenes.draw_text(surface, f'{self.stats.level}', scenes.x_scaled(x-50), scenes.y_scaled(y-2))
-        hp_bar_rect = pygame.Rect(scenes.x_scaled(x-30), scenes.y_scaled(y), self.hp_bar_width, self.hp_bar_height)
+        surface.blit(self.sprite, dest = (u.x_scaled(x), u.y_scaled(y)))
+        u.draw_text(surface, f'{self.stats.level}', u.x_scaled(x-50), u.y_scaled(y-2))
+        hp_bar_rect = pygame.Rect(u.x_scaled(x-30), u.y_scaled(y), self.hp_bar_width, self.hp_bar_height)
         pygame.draw.rect(surface, settings.RED, hp_bar_rect)
         
-        scenes.draw_text(surface, f'HP: {self.current_hp}/{self.stats.hp}', scenes.x_scaled(x+200), scenes.y_scaled(y))
+        u.draw_text(surface, f'HP: {self.current_hp}/{self.stats.hp}', u.x_scaled(x+200), u.y_scaled(y))
+        self.stats.combat_bar.update(surface)
     def damage(self, amount):
         self.current_hp -= amount
         self.hp_bar_width = self.max_bar_width * self.current_hp / self.stats.hp
     #def kill(self):
 
 
-class Player:
-    def __init__(self, id, name):
-        self.id = id
-        self.name = name
 
-        self.level = 1
 
-        # Tweakable gameplay parameters; keep as integer 
-        max_level = 100
-        hp_gain_variation = 3    
-        atk_gain_variation = 1
-        self.hp_growth = 10     # average amount of hp growth on level up
-        self.atk_growth = 2     # average amount of atk growth on level up
-
-        # Tweakable ui parameters
-        self.hp_bar_width = 300
-        self.hp_bar_height = 50
-
-        # Create variation in stats gained from levelling up (just random noise)
-        rng = np.random.default_rng(1461296)
-        rand = rng.integers(-1, 1, max_level + 1)               # Stores max_level + 1 random values in between -1 and 1 (fixed) 
-        self.hp_var = hp_gain_variation * rand         # Variation in hp gain with a level up  (same for all players)
-        self.atk_var = atk_gain_variation * rand        # Variation in atk gain with a level up (same for all players)
-
-        self.hp = 30
-        self.atk = 4 
-        self.curr_hp = self.hp
-    
-    def level_up(self):
-        self.hp += self.hp_growth + self.hp_var[self.level]
-        self.atk += self.atk_growth + self.atk_var[self.level]
-        self.level += 1
-
-    def show_hud(self, surface): 
-        hp_x, hp_y = 100, 100
-        scenes.draw_text(surface, f'HP: {self.curr_hp}/{self.hp}', scenes.x_scaled(hp_x), scenes.y_scaled(hp_y))
-        draw_hp_bar(surface, scenes.x_scaled(hp_x + 30), scenes.y_scaled(hp_y), self.hp_bar_width, self.hp_bar_height)
 

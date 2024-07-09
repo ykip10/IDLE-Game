@@ -1,4 +1,4 @@
-import pygame, sys, settings, mobs, random
+import pygame, sys, settings, mobs, player, utility as u
 import resources as r
 import utility as u
 from collections import defaultdict
@@ -6,28 +6,7 @@ from collections import defaultdict
 pygame.init()
 
 
-
 rect_coords = defaultdict() # Stores rectangle coordinates for each labelled rectangle 
-
-def x_scaled(x):
-    """
-    Returns x-  coordinate scaled to custom resolutions
-    """
-    return settings.width * x / settings.NATIVE_WIDTH
-
-
-def y_scaled(y):
-    """
-    Returns y-coordinate scaled to custom resolutions
-    """
-    return settings.height * y / settings.NATIVE_HEIGHT
-
-
-#Text draw function (replace with images)
-def draw_text(surface, text, x, y):                     # surface = screen it draws on
-    text_surface = settings.font.render(text, True, settings.WHITE)       
-    surface.blit(text_surface, (x_scaled(x), y_scaled(y)))
-
 
 def draw_button(surface, text, x, y, color = settings.GREEN):
     """
@@ -35,10 +14,10 @@ def draw_button(surface, text, x, y, color = settings.GREEN):
     """
     text_surface = settings.font.render(text, True, settings.WHITE) # Turn text into a surface
     text_rect = text_surface.get_rect() # Find rectangle of the surface 
-    rect_coords[text] = (x_scaled(x-5), y_scaled(y), x_scaled(text_rect.width + 10), y_scaled(text_rect.height)) # Map the text label to the corresponding rectangles coordinates 
+    rect_coords[text] = (u.x_scaled(x-5), u.y_scaled(y), u.x_scaled(text_rect.width + 10), u.y_scaled(text_rect.height)) # Map the text label to the corresponding rectangles coordinates 
     pygame.draw.rect(surface, color, rect_coords[text])  # .draw.rect takes arguments (surface, RGB, (x_left, y_top, width, height))
     
-    draw_text(surface, text, x, y) # After drawing the rectangle, draw the text. 
+    u.draw_text(surface, text, x, y) # After drawing the rectangle, draw the text. 
        
 
 def in_bounds(text, mouse_x, mouse_y):
@@ -48,31 +27,19 @@ def in_bounds(text, mouse_x, mouse_y):
     return rect_coords[text][0] <= mouse_x <= rect_coords[text][0] + rect_coords[text][2] and rect_coords[text][1] <= mouse_y <= rect_coords[text][1] + rect_coords[text][3]
 
 
-def load_slime_sheet():
-    sheet = pygame.image.load(r'sprites/slimes/slime-Sheet.png').convert_alpha()
-    return sheet 
+def show_hp(surface, player):
+    ''' Shows hp bar. ''' 
+    hp_bar_width, hp_bar_height = 300, 50 
+    hp_x, hp_y = 50, 300
 
+    text = f'HP: {player.curr_hp}/{player.hp}'
+    text_surface = settings.font.render(text, True, settings.WHITE) # 
+    text_rect = text_surface.get_rect()
 
-def get_mob_frame(sheet, size, row, column, colour):
-    frame = pygame.Surface((size[0], size[1])).convert_alpha()
-    frame.fill(colour)
-    frame.blit(sheet, (0, 0), (row*size[0], column*size[1], size[0], size[1]))
-    frame = pygame.transform.scale(frame, (settings.MOB_HEIGHT, settings.MOB_SIZE))
-    return frame
-
-
-def show_gold(screen):
-    draw_text(screen, str(r.gold), 10, 10)
-
-
-def show_hud(surface, player): 
-        hp_bar_width, hp_bar_height = 300, 50 
-        hp_x, hp_y = 100, 100
-
-        draw_text(surface, f'HP: {player.curr_hp}/{player.hp}', x_scaled(hp_x), y_scaled(hp_y))
-
-        hp_bar_rect = pygame.Rect(x_scaled(hp_x + 150), x_scaled(hp_y - 10 ), hp_bar_width, hp_bar_height)
-        pygame.draw.rect(surface, settings.RED, hp_bar_rect)
+    hp_bar_rect = pygame.Rect(u.x_scaled(hp_x) , u.y_scaled(hp_y), u.x_scaled(hp_bar_width), u.y_scaled(hp_bar_height))
+    pygame.draw.rect(surface, settings.RED, hp_bar_rect)
+    u.draw_text(surface, f'HP: {player.curr_hp}/{player.hp}', u.x_scaled(hp_x + hp_bar_width / 2 - text_rect.width / 2), u.y_scaled(hp_y + hp_bar_height / 2 - text_rect.height / 2)) # draws text in the MIDDLE of the hp bar
+        
 
 
 class Transition:
@@ -93,7 +60,7 @@ class DisplayEngine:
         self.clock = pygame.time.Clock()
         self.delta = 0 
         self.Transition = Transition()
-        self.player = mobs.Player(0, 'Skippay')
+        self.player = player.Player(0, 'Skippay')
 
     def loop(self):
         while True:
@@ -130,11 +97,12 @@ class main_scene(scene):
         super().__init__(engine)
         self.background = settings.MAIN_BACKGROUND # Background of scene 
 
-        # Load mob sheets
-        self.slime_sheet = load_slime_sheet()
-        self.curr_frame = get_mob_frame(self.slime_sheet, (32, 32), 1, 0, settings.MAIN_BACKGROUND)
-        self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1, 0)
+        # Load images 
+        self.slime_sheet = pygame.image.load(r'sprites/slimes/slime-Sheet.png').convert_alpha()
+        self.atk_icon = pygame.image.load(r'sprites/icons/attack_icon.png').convert_alpha()
 
+        self.curr_frame = u.get_mob_frame(self.slime_sheet, (32, 32), 1, 0, settings.MAIN_BACKGROUND)
+        self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1, 0)
         
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
@@ -147,9 +115,9 @@ class main_scene(scene):
             total_rate += r.Generator.get_gen(i).rate
 
         # Resources info
-        show_gold(screen)                                   # Current Resource Amount
-        draw_text(screen, str(r.gems), 200, 10)                           # Gem count
-        draw_text(screen, f'Income: {str(total_rate)}g/s', 390, 10)     # Current income 
+        u.draw_text(screen, str(r.gold), 10, 10)                                   # Current Resource Amount
+        u.draw_text(screen, str(r.gems), 200, 10)                           # Gem count
+        u.draw_text(screen, f'Income: {str(total_rate)}g/s', 410, 10)     # Current income 
 
         # Work button
         draw_button(screen, "Go to work", 1130, 670)
@@ -160,12 +128,11 @@ class main_scene(scene):
         # Settings button
         draw_button(screen, "Settings", 100, 670)
 
-        self.curr_mob.draw(screen, 210, 340)
-        self.curr_mob.stats.combat_bar.update(screen)
-        
+        # Draw mob + combat bar
+        self.curr_mob.draw(screen, 810, 340)
         
         # HUD
-        show_hud(screen, self.engine.player)
+        show_hp(screen, self.engine.player)
         
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -196,29 +163,29 @@ class shop_scene(scene):
 
         pygame.display.set_caption('Shop')
 
-        draw_text(screen, str(r.gold), 10, 10)                            # Current Resource Amount
-        draw_text(screen, str(r.gems), 200, 10)                           # Gem count
+        u.draw_text(screen, str(r.gold), 10, 10)                            # Current Resource Amount
+        u.draw_text(screen, str(r.gems), 200, 10)                           # Gem count
 
         # Drawing "Return" button
         draw_button(screen, "Return",  20, 670)
         
         # Drawing Upgrade buttons/text 
-        draw_text(screen, "Generators", 20, 50)
-        draw_text(screen, "Click Upgrades", 650, 50)
+        u.draw_text(screen, "Generators", 20, 50)
+        u.draw_text(screen, "Click Upgrades", 650, 50)
 
         draw_button(screen, "Buy Generator 1", 20, 90)
-        draw_text(screen, '+' + str(r.generator1.base_rate) + ' g/s', 225, 90)
-        draw_text(screen, 'Current: ' + str(r.generator1.rate) + 'g/s', 315, 90)
+        u.draw_text(screen, '+' + str(r.generator1.base_rate) + ' g/s', 225, 90)
+        u.draw_text(screen, 'Current: ' + str(r.generator1.rate) + 'g/s', 315, 90)
         draw_button(screen, "Buy Generator 2", 20, 140)
-        draw_text(screen, '+' + str(r.generator2.base_rate) + ' g/s', 225,  140)
-        draw_text(screen, 'Current: ' + str(r.generator2.rate) + 'g/s', 315, 140)
+        u.draw_text(screen, '+' + str(r.generator2.base_rate) + ' g/s', 225,  140)
+        u.draw_text(screen, 'Current: ' + str(r.generator2.rate) + 'g/s', 315, 140)
 
         draw_button(screen, "Buy Clicker 1", 650, 90)
-        draw_text(screen, '+' + str(r.clicker1.base_rate) + ' g/click', 815,  90)
-        draw_text(screen, 'Current: ' + str(r.clicker1.rate) + 'g/click', 940, 90)
+        u.draw_text(screen, '+' + str(r.clicker1.base_rate) + ' g/click', 815,  90)
+        u.draw_text(screen, 'Current: ' + str(r.clicker1.rate) + 'g/click', 940, 90)
         draw_button(screen, "Buy Clicker 2", 650, 140)
-        draw_text(screen, '+' + str(r.clicker2.base_rate) + ' g/click', 815,  140)
-        draw_text(screen, 'Current: ' + str(r.clicker2.rate) + 'g/click', 940, 140)
+        u.draw_text(screen, '+' + str(r.clicker2.base_rate) + ' g/click', 815,  140)
+        u.draw_text(screen, 'Current: ' + str(r.clicker2.rate) + 'g/click', 940, 140)
 
     def on_event(self, event): # Functionality (clicking) of shop scene
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -268,15 +235,18 @@ class working_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
         self.background = settings.MAIN_BACKGROUND
-        self.work = mobs.Work_Bar(0, 0.01, 0)
+        self.work = mobs.Work_Bar(0, 0.01, 0) # Initialise the working bar
+
     def draw(self): 
         pygame.display.set_caption('Working')
         screen = self.engine.surface
         screen.fill(self.background)
-        draw_button(screen, 'Return', 20, 670)
-        show_gold(screen)
 
-        self.work.update(screen)
+        draw_button(screen, 'Return', 20, 670) # Draw return button
+
+        u.draw_text(screen, str(r.gold), 10, 10) # Show gold 
+        self.work.update(screen) # Update the working bar
+
     def on_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos

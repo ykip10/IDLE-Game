@@ -28,14 +28,6 @@ width = 1280
 height = 720
 fps = 60 
 
-
-# Combat 
-
-
-hp_bar_width = 200
-hp_bar_height = 20
-
-
 font = pygame.font.Font(None, 36) # font 
 
 #User Preferences

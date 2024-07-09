@@ -1,4 +1,4 @@
-import pygame, sys, settings, mobs
+import pygame, sys, settings, mobs, random
 import resources as r
 import utility as u
 from collections import defaultdict
@@ -60,8 +60,20 @@ def get_mob_frame(sheet, size, row, column, colour):
     frame = pygame.transform.scale(frame, (settings.MOB_HEIGHT, settings.MOB_SIZE))
     return frame
 
+
 def show_gold(screen):
-    draw_text(screen, str(r.gold), 10, 10) 
+    draw_text(screen, str(r.gold), 10, 10)
+
+
+def show_hud(surface, player): 
+        hp_bar_width, hp_bar_height = 300, 50 
+        hp_x, hp_y = 100, 100
+
+        draw_text(surface, f'HP: {player.curr_hp}/{player.hp}', x_scaled(hp_x), y_scaled(hp_y))
+
+        hp_bar_rect = pygame.Rect(x_scaled(hp_x + 150), x_scaled(hp_y - 10 ), hp_bar_width, hp_bar_height)
+        pygame.draw.rect(surface, settings.RED, hp_bar_rect)
+
 
 class Transition:
     def __init__(self):
@@ -81,6 +93,7 @@ class DisplayEngine:
         self.clock = pygame.time.Clock()
         self.delta = 0 
         self.Transition = Transition()
+        self.player = mobs.Player(0, 'Skippay')
 
     def loop(self):
         while True:
@@ -120,7 +133,7 @@ class main_scene(scene):
         # Load mob sheets
         self.slime_sheet = load_slime_sheet()
         self.curr_frame = get_mob_frame(self.slime_sheet, (32, 32), 1, 0, settings.MAIN_BACKGROUND)
-        self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1)
+        self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1, 0)
 
         
     def draw(self): # Draw MAIN scene here 
@@ -149,7 +162,10 @@ class main_scene(scene):
 
         self.curr_mob.draw(screen, 210, 340)
         self.curr_mob.stats.combat_bar.update(screen)
-        #self.combat_bar = r.Combat_Bar(10, 0, 5, 0)
+        
+        
+        # HUD
+        show_hud(screen, self.engine.player)
         
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -252,16 +268,23 @@ class working_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
         self.background = settings.MAIN_BACKGROUND
+        self.work = mobs.Work_Bar(0, 0.01, 0)
     def draw(self): 
         pygame.display.set_caption('Working')
         screen = self.engine.surface
         screen.fill(self.background)
         draw_button(screen, 'Return', 20, 670)
         show_gold(screen)
+
+        self.work.update(screen)
     def on_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             if in_bounds('Return', mouse_x, mouse_y):
                 self.engine.Transition.next_scene = main_scene(self.engine)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                self.work.reset()
+        
             
 

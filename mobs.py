@@ -21,8 +21,10 @@ def ver_gradientRect(surface, bottom_colour, top_colour, target_rect):
 def get_random_seed():
     return int(np.random.uniform(0, 1000))
 
-# Combat stuff 
+
 class Bar: # Only supports 1 dimensional motion in x or y direction 
+    ''' Super class for all Bar mechanics
+    '''
     def __init__(self, ini_speed, ini_acceleration, jerk):
         """ Width refers to the width of the """
         self.ini_speed = ini_speed
@@ -41,16 +43,16 @@ class Bar: # Only supports 1 dimensional motion in x or y direction
 
         self.bar = None # Bar to be drawn 
 
-    def draw(self, surface): 
-        surface.blit(self.bar, dest = (self.x_bar, self.y_bar)) # Draws the bar 
-
-        # Other drawings need to be specified in the subclass
+    def draw(self, surface): pass
+        # Drawings need to be specified in the subclass
     def update(self, surface): 
         # speed etc. logic here
         pass 
 
 
 class Combat_Bar(Bar): 
+    """ Contains information about the combat bar and all associated mechanics
+    """
     def __init__(self, goal_width, width, ini_speed, ini_acceleration, jerk):
         """ 
         goal_width: width of goal indicator
@@ -90,7 +92,7 @@ class Combat_Bar(Bar):
     def draw(self, surface):
         """ Draws the combat bar.
         """
-        super().draw(surface)
+        surface.blit(self.bar, dest = (self.x_bar, self.y_bar)) # Draws the bar 
         
         # Drawing of goal bar and combat indicator 
         pygame.draw.rect(surface, settings.GREEN, self.goal_bar)
@@ -142,70 +144,148 @@ class Combat_Bar(Bar):
 
 
 class Work_Bar(Bar):
+    """ Contains information about the bar on the employment screen and all associated mechanics
+    """
     def __init__(self, ini_speed, ini_acceleration, jerk):
+        """ ini_speed: initial speed of the bar
+        ini_acceleration: initial acceleration of the bar
+        jerk: jerk of the bar 
+        """
         super().__init__(ini_speed, ini_acceleration, jerk)
 
         # Dimensions of the bar
-        self.bar_width = Combat_Bar.bar_height
-        self.bar_height = Combat_Bar.bar_width
+        self.bar_width = 50
+        self.bar_height = 250
 
         # Coordinates of the bar
         self.x_bar = 500
         self.y_bar = 300
 
-        self.y = self.x_bar + self.bar_width # Starting y position of black box 
-        self.bar = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))         # initalisation of gradiented meter 
-        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))   # initialisation of black box (wi)
+        self.y = self.bar_height # Starting y position of black box 
+        self.bar = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))     # initalisation of gradiented meter 
+        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))   # initialisation of black box (wi)
 
         # For logic in update method
         self.speed = ini_speed
         self.acceleration = ini_acceleration
         self.jerk = jerk
 
+        self.going_up = True 
+
     def draw(self, surface):
-        super().draw(surface)
-        ver_gradientRect(surface, settings.YELLOW, settings.RED, self.bar) # Draw gradiented meter 
-        pygame.draw.rect(surface, settings.BLACK, self.black_box)
+        """ Draws the gradiented meter as well as the black box
+        """
+        ver_gradientRect(surface, settings.RED, settings.YELLOW, self.bar) # Draw gradiented meter
+        pygame.draw.rect(surface, settings.BLACK, self.black_box) 
 
     def update(self, surface):
-        self.y -= self.speed
+        """ Updates position of the black box and redraws the scene
+        """
+        if self.going_up:
+            self.y -= self.speed
+            self.speed += self.acceleration
+            self.acceleration += self.jerk
+            if self.y <= 0: 
+                self.going_up = False 
+        else:
+            self.y += self.speed
+            self.speed -= self.acceleration
+            self.acceleration -= self.jerk
+            if self.y >= self.bar_height:
+                self.going_up = True
+                self.speed = self.ini_speed
+                self.acceleration = self.ini_acceleration
+
+        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))
+        self.draw(surface)
+
+    def reset(self):
+        """ Resets bar to the bottom 
+        """
+        self.y = self.bar_height
+        self.speed = self.ini_speed
+        self.acceleration = self.ini_acceleration
 
 
-class Stats: 
-    def __init__(self, level):
+class Mob_stats: 
+    def __init__(self, level, player_id):
         self.level = level
         base_hp = level * 50
-        base_atk = level * 10
+        base_atk = level * 5
 
-        self.hp = round(np.random.normal(loc = base_hp, scale = base_hp / settings.VAR_FACTOR))
-        self.atk = round(np.random.normal(loc = base_atk, scale = base_atk / settings.VAR_FACTOR))
+        rng = np.random.default_rng(player_id)
+        self.hp = round(rng.normal(loc = base_hp, scale = base_hp / settings.VAR_FACTOR))
+        self.atk = round(rng.normal(loc = base_atk, scale = base_atk / settings.VAR_FACTOR))
 
         jerk = 0
         if level >= 10:
             jerk = math.sqrt(level)
         self.combat_bar = Combat_Bar(30, 10, 0, settings.BAR_DIFFICULTY * round(math.log(1 + level, settings.BAR_SPEED_GROWTH)), jerk)
 
+
 class Mob:
-    def __init__(self, sprite, name, level):
+    def __init__(self, sprite, name, level, player_id):
         """ Size is a tuple describing the pixel by pixel size of the sprite. 
         """
         self.sprite = sprite
         self.name = name 
-        self.stats = Stats(level)
+        self.stats = Mob_stats(level, player_id)
         self.current_hp = self.stats.hp
-        self.hp_bar_width = settings.hp_bar_width
+        
+        self.max_bar_width = 200 
+        self.hp_bar_height = 20 
+        self.hp_bar_width = self.max_bar_width
 
     def draw(self, surface, x, y):
         """ Draws the sprite and level of the mob. (x, y) position are coordinates of top left of sprite rectangle.  
         """
         surface.blit(self.sprite, dest = (scenes.x_scaled(x), scenes.y_scaled(y)))
         scenes.draw_text(surface, f'{self.stats.level}', scenes.x_scaled(x-50), scenes.y_scaled(y-2))
-        hp_bar_rect = pygame.Rect(scenes.x_scaled(x-30), scenes.y_scaled(y), self.hp_bar_width, settings.hp_bar_height)
+        hp_bar_rect = pygame.Rect(scenes.x_scaled(x-30), scenes.y_scaled(y), self.hp_bar_width, self.hp_bar_height)
         pygame.draw.rect(surface, settings.RED, hp_bar_rect)
         
         scenes.draw_text(surface, f'HP: {self.current_hp}/{self.stats.hp}', scenes.x_scaled(x+200), scenes.y_scaled(y))
     def damage(self, amount):
         self.current_hp -= amount
-        self.hp_bar_width = settings.hp_bar_width * self.current_hp / self.stats.hp
+        self.hp_bar_width = self.max_bar_width * self.current_hp / self.stats.hp
     #def kill(self):
+
+
+class Player:
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+        self.level = 1
+
+        # Tweakable gameplay parameters; keep as integer 
+        max_level = 100
+        hp_gain_variation = 3    
+        atk_gain_variation = 1
+        self.hp_growth = 10     # average amount of hp growth on level up
+        self.atk_growth = 2     # average amount of atk growth on level up
+
+        # Tweakable ui parameters
+        self.hp_bar_width = 300
+        self.hp_bar_height = 50
+
+        # Create variation in stats gained from levelling up (just random noise)
+        rng = np.random.default_rng(1461296)
+        rand = rng.integers(-1, 1, max_level + 1)               # Stores max_level + 1 random values in between -1 and 1 (fixed) 
+        self.hp_var = hp_gain_variation * rand         # Variation in hp gain with a level up  (same for all players)
+        self.atk_var = atk_gain_variation * rand        # Variation in atk gain with a level up (same for all players)
+
+        self.hp = 30
+        self.atk = 4 
+        self.curr_hp = self.hp
+    
+    def level_up(self):
+        self.hp += self.hp_growth + self.hp_var[self.level]
+        self.atk += self.atk_growth + self.atk_var[self.level]
+        self.level += 1
+
+    def show_hud(self, surface): 
+        hp_x, hp_y = 100, 100
+        scenes.draw_text(surface, f'HP: {self.curr_hp}/{self.hp}', scenes.x_scaled(hp_x), scenes.y_scaled(hp_y))
+        draw_hp_bar(surface, scenes.x_scaled(hp_x + 30), scenes.y_scaled(hp_y), self.hp_bar_width, self.hp_bar_height)
 

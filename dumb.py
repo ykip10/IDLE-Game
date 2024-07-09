@@ -1,12 +1,9 @@
 import numpy as np
 
 # Set a different seed for the first call
+max_level = 100 
+rng = np.random.default_rng(1461296) 
 
-number1 = np.random.normal(50, 10)
-print(number1)
+rand = rng.uniform(-1, 1, max_level)
 
-# Set a different seed for the second call
-
-number1 = np.random.normal(50, 10)
-
-print(number1)
+print(100*rand)

@@ -29,15 +29,14 @@ def convert_decimal(number):
 
 
 
-#Drawing tools 
-
-#Text draw function (replace with images)
+# Drawing tools 
 def draw_text(surface, text, x, y): 
     """ Draws a string onto a surface, with (x, y) representing coordinates of top left
     of string. 
     """                    
     text_surface = settings.font.render(text, True, settings.WHITE)       
     surface.blit(text_surface, (x_scaled(x), y_scaled(y)))
+
 
 def image_to_rect(image, size, desired_size):
     """ Takes an image and outputs a Rect pygame object representing the image

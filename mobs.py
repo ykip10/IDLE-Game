@@ -1,5 +1,5 @@
-import pygame, settings, scenes, math, numpy as np
-import utility as u
+import pygame, math, numpy as np
+import settings, utility as u, resources as r
 
 
 def get_random_seed():
@@ -135,71 +135,6 @@ class Combat_Bar(Bar):
         self.goal_bar = pygame.Rect(self.x_bar + (self.bar_width - self.width - self.goal_width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
 
 
-class Work_Bar(Bar):
-
-    """ Contains information about the bar on the employment screen and all associated mechanics
-    """
-    def __init__(self, ini_speed, ini_acceleration, jerk):
-        """ ini_speed: initial speed of the bar
-        ini_acceleration: initial acceleration of the bar
-        jerk: jerk of the bar 
-        """
-        super().__init__(ini_speed, ini_acceleration, jerk)
-
-        # Dimensions of the bar
-        self.bar_width = settings.work_bar_width
-        self.bar_height = settings.work_bar_height
-
-        # Coordinates of the bar
-        self.x_bar = settings.work_bar_x
-        self.y_bar = settings.work_bar_y
-
-        self.y = self.bar_height # Starting y position of black box 
-        self.bar = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))     # initalisation of gradiented meter 
-        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))   # initialisation of black box (wi)
-
-        # For logic in update method
-        self.speed = ini_speed
-        self.acceleration = ini_acceleration
-        self.jerk = jerk
-
-        self.going_up = True 
-
-    def draw(self, surface):
-        """ Draws the gradiented meter as well as the black box
-        """
-        u.ver_gradientRect(surface, settings.RED, settings.YELLOW, self.bar) # Draw gradiented meter
-        pygame.draw.rect(surface, settings.BLACK, self.black_box) 
-
-    def update(self, surface):
-        """ Updates position of the black box and redraws the scene
-        """
-        if self.going_up:
-            self.y -= self.speed
-            self.speed += self.acceleration
-            self.acceleration += self.jerk
-            if self.y <= 0: 
-                self.going_up = False 
-        else:
-            self.y += self.speed
-            self.speed -= self.acceleration
-            self.acceleration -= self.jerk
-            if self.y >= self.bar_height:
-                self.going_up = True
-                self.speed = self.ini_speed
-                self.acceleration = self.ini_acceleration
-
-        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))
-        self.draw(surface)
-
-    def reset(self):
-        """ Resets bar to the bottom 
-        """
-        self.y = self.bar_height
-        self.speed = self.ini_speed
-        self.acceleration = self.ini_acceleration
-
-
 class Mob_stats: 
     def __init__(self, level, player_id):
         self.level = level
@@ -248,6 +183,83 @@ class Mob:
     #def kill(self):
 
 
+class Work_Bar(Bar):
+
+    """ Contains information about the bar on the employment screen and all associated mechanics
+    """
+    def __init__(self, ini_speed, ini_acceleration, jerk):
+        """ ini_speed: initial speed of the bar
+        ini_acceleration: initial acceleration of the bar
+        jerk: jerk of the bar 
+        """
+        super().__init__(ini_speed, ini_acceleration, jerk)
+        # Dimensions of the bar
+        self.bar_width = settings.work_bar_width
+        self.bar_height = settings.work_bar_height
+
+        # Coordinates of the bar
+        self.x_bar = settings.work_bar_x
+        self.y_bar = settings.work_bar_y
+
+        self.y = self.bar_height # Starting y position of black box 
+        self.bar = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))     # initalisation of gradiented meter 
+        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))   # initialisation of black box (wi)
+
+        # For logic in update method
+        self.speed = ini_speed
+        self.combod_accel = ini_acceleration
+        self.acceleration = self.combod_accel
+        self.jerk = jerk
+        self.going_up = True 
+
+        # goal indicator
+        self.proportion_goal = 0.97 # Need fill up this much of the bar to get a goal
+        goal_x, goal_y, goal_width, goal_height = self.x_bar - 5, self.y_bar + self.bar_height * (1 - self.proportion_goal), self.bar_width + 10, 1
+        self.goal_indicator = pygame.Rect(goal_x, goal_y, goal_width, goal_height)
+
+        # combo
+        self.goal = False
+        self.combo = 1
+
+    def draw(self, surface):
+        """ Draws the gradiented meter as well as the black box
+        """
+        u.ver_gradientRect(surface, settings.RED, settings.YELLOW, self.bar) # Draw gradiented meter
+        pygame.draw.rect(surface, settings.BLACK, self.black_box)
+        pygame.draw.rect(surface, settings.WHITE, self.goal_indicator) 
+
+    def update(self, surface):
+        """ Updates position of the black box and redraws the scene
+        """
+        if self.going_up:
+            self.y -= self.speed
+            self.speed += self.acceleration
+            self.acceleration += self.jerk
+            if self.y <= 0: 
+                self.going_up = False 
+        else:
+            self.y += self.speed
+            self.speed -= self.acceleration
+            self.acceleration -= self.jerk
+            if self.y >= self.bar_height:
+                self.going_up = True
+                self.speed = self.ini_speed
+                self.acceleration = self.ini_acceleration
+                self.combo = 1 
 
 
+        self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))
+
+        self.goal = self.goal_indicator.topleft[1] >= self.black_box.bottomleft[1]  
+
+        self.draw(surface)
+
+
+    def hard_reset(self):
+        """ Resets bar to initial state
+        """
+        self.y = self.bar_height
+        self.going_up = True
+        self.speed = self.ini_speed
+        self.acceleration = self.ini_acceleration*math.sqrt(self.combo)
 

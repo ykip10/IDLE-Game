@@ -272,7 +272,7 @@ class working_scene(scene):
     def __init__(self, engine):
         super().__init__(engine)
         self.background = settings.MAIN_BACKGROUND
-        self.work = mobs.Work_Bar(0, 0.01, 0) # Initialise the working bar
+        self.work = mobs.Work_Bar(0, 0.02, 0) # Initialise the working bar
 
     def draw(self): 
         pygame.display.set_caption('Working')
@@ -284,6 +284,7 @@ class working_scene(scene):
         u.draw_text(screen, str(r.gold), 10, 10) # Show gold 
         self.work.update(screen) # Update the working bar
 
+        u.draw_text(screen, f'x{self.work.combo - 1}!', 1000, 600)
     def on_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
@@ -291,7 +292,12 @@ class working_scene(scene):
                 self.engine.Transition.next_scene = main_scene(self.engine)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                self.work.reset()
+                if self.work.goal:
+                    r.gold.amount += 2*self.work.combo 
+                    self.work.combo += 1
+                else:
+                    self.work.combo = 1
+                self.work.hard_reset()
         
             
 

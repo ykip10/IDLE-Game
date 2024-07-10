@@ -1,23 +1,6 @@
 import pygame, settings, scenes, math, numpy as np
 import utility as u
 
-# credit: https://stackoverflow.com/questions/62336555/how-to-add-color-gradient-to-rectangle-in-pygame
-def hor_gradientRect(surface, left_colour, right_colour, target_rect):
-    """ Draw a horizontal-gradient filled rectangle covering <target_rect> """
-    colour_rect = pygame.Surface((2, 2))                                   # tiny! 2x2 bitmap
-    pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))            # left colour line
-    pygame.draw.line(colour_rect, right_colour, (1, 0), (1, 1))            # right colour line
-    colour_rect = pygame.transform.smoothscale(colour_rect, (target_rect.width, target_rect.height))  # stretch!
-    surface.blit(colour_rect, target_rect)                  
-
-
-def ver_gradientRect(surface, bottom_colour, top_colour, target_rect):
-    """ Draw a Vertical-gradient filled rectangle covering <target_rect> """
-    colour_rect = colour_rect = pygame.Surface((2, 2))
-    pygame.draw.line(colour_rect, bottom_colour, (0, 0), (1, 0))
-    pygame.draw.line(colour_rect, top_colour, (0, 1), (1, 1))
-    colour_rect = pygame.transform.smoothscale(colour_rect, (target_rect.width, target_rect.height))
-    surface.blit(colour_rect, target_rect)
 
 def get_random_seed():
     return int(np.random.uniform(0, 1000))
@@ -66,12 +49,12 @@ class Combat_Bar(Bar):
         super().__init__(ini_speed, ini_acceleration, jerk)
         
         # Dimensions of bar 
-        self.bar_width = 250
-        self.bar_height = 50
+        self.bar_width = settings.combat_bar_width
+        self.bar_height = settings.combat_bar_height
 
         # Coordinates of bar
-        self.x_bar = 450
-        self.y_bar = 600
+        self.x_bar = settings.combat_bar_x
+        self.y_bar = settings.combat_bar_y
 
         self.width = settings.COMBAT_INDICATOR_WIDTH
         self.x = self.x_bar # Starting x position of combat indicator
@@ -88,7 +71,9 @@ class Combat_Bar(Bar):
 
         self.goal_bar = pygame.Rect(self.x_bar + (self.bar_width - self.width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
         self.goal = False
-   
+
+        self.hit_left = False
+        self.hit_right = False 
         
     def draw(self, surface):
         """ Draws the combat bar.
@@ -107,21 +92,25 @@ class Combat_Bar(Bar):
             self.speed += self.acceleration
             self.acceleration = abs(self.acceleration)
             self.acceleration += self.jerk
+            self.hit_left = False
         elif self.x_bar + (self.bar_width - self.width ) / 2 <= self.x  <= self.x_bar + self.bar_width - self.width: # In second half 
             self.x += self.speed
             self.acceleration = -abs(self.acceleration)
             self.speed += self.acceleration
             self.acceleration -= self.jerk
+            self.hit_right = False 
         elif self.x >= self.x_bar + self.bar_width - self.width: # Past right border
             self.x += self.speed 
             self.speed = -abs(self.ini_speed)
             self.speed += self.acceleration
             self.acceleration -= self.jerk 
+            self.hit_right = True
         elif self.x <= self.x_bar: # Past left border
             self.x += self.speed    
             self.speed = abs(self.ini_speed) 
             self.speed += self.acceleration
             self.acceleration += self.jerk 
+            self.hit_left = True
 
         # Update combat indicator position based on the value of x. 
         self.combat_indicator = pygame.Rect(self.x, self.y_bar - 10, self.width, self.bar_height + 20)
@@ -147,6 +136,7 @@ class Combat_Bar(Bar):
 
 
 class Work_Bar(Bar):
+
     """ Contains information about the bar on the employment screen and all associated mechanics
     """
     def __init__(self, ini_speed, ini_acceleration, jerk):
@@ -157,12 +147,12 @@ class Work_Bar(Bar):
         super().__init__(ini_speed, ini_acceleration, jerk)
 
         # Dimensions of the bar
-        self.bar_width = 50
-        self.bar_height = 250
+        self.bar_width = settings.work_bar_width
+        self.bar_height = settings.work_bar_height
 
         # Coordinates of the bar
-        self.x_bar = 500
-        self.y_bar = 300
+        self.x_bar = settings.work_bar_x
+        self.y_bar = settings.work_bar_y
 
         self.y = self.bar_height # Starting y position of black box 
         self.bar = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.bar_height))     # initalisation of gradiented meter 
@@ -178,7 +168,7 @@ class Work_Bar(Bar):
     def draw(self, surface):
         """ Draws the gradiented meter as well as the black box
         """
-        ver_gradientRect(surface, settings.RED, settings.YELLOW, self.bar) # Draw gradiented meter
+        u.ver_gradientRect(surface, settings.RED, settings.YELLOW, self.bar) # Draw gradiented meter
         pygame.draw.rect(surface, settings.BLACK, self.black_box) 
 
     def update(self, surface):
@@ -239,6 +229,8 @@ class Mob:
         self.hp_bar_height = 20 
         self.hp_bar_width = self.max_bar_width
 
+        self.can_attack = True
+        
     def draw(self, surface, x, y):
         """ Draws the sprite and level of the mob. (x, y) position are coordinates of top left of sprite rectangle.  
         """
@@ -252,6 +244,7 @@ class Mob:
     def damage(self, amount):
         self.current_hp -= amount
         self.hp_bar_width = self.max_bar_width * self.current_hp / self.stats.hp
+        self.damaged = True 
     #def kill(self):
 
 

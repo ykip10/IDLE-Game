@@ -27,19 +27,36 @@ def in_bounds(text, mouse_x, mouse_y):
     return rect_coords[text][0] <= mouse_x <= rect_coords[text][0] + rect_coords[text][2] and rect_coords[text][1] <= mouse_y <= rect_coords[text][1] + rect_coords[text][3]
 
 
-def show_hp(surface, player):
-    ''' Shows hp bar. ''' 
+def show_hud(surface, player, atk_icon, background):
+    ''' Shows hud (atk_icon and HP bar). ''' 
+
+    # Hp bar
     hp_bar_width, hp_bar_height = 300, 50 
-    hp_x, hp_y = 50, 300
+    hp_x, hp_y = 10, 70
 
     text = f'HP: {player.curr_hp}/{player.hp}'
     text_surface = settings.font.render(text, True, settings.WHITE) # 
     text_rect = text_surface.get_rect()
 
-    hp_bar_rect = pygame.Rect(u.x_scaled(hp_x) , u.y_scaled(hp_y), u.x_scaled(hp_bar_width), u.y_scaled(hp_bar_height))
+    hp_bar_rect = pygame.Rect(u.x_scaled(hp_x) , u.y_scaled(hp_y), u.x_scaled(hp_bar_width)* player.curr_hp / player.hp , u.y_scaled(hp_bar_height))
     pygame.draw.rect(surface, settings.RED, hp_bar_rect)
     u.draw_text(surface, f'HP: {player.curr_hp}/{player.hp}', u.x_scaled(hp_x + hp_bar_width / 2 - text_rect.width / 2), u.y_scaled(hp_y + hp_bar_height / 2 - text_rect.height / 2)) # draws text in the MIDDLE of the hp bar
-        
+    
+    # Drawing attack icon and corresponding string 
+    text = f'{player.atk}'
+    font = pygame.font.Font(None, 48) # font
+    if player.can_attack: 
+        text_surface = font.render(text, True, settings.WHITE)
+    else: 
+        text_surface = font.render(text, True, settings.BLACK)
+
+    atk_icon_surface = u.image_to_surface(atk_icon, (32, 32), (64, 64), background)
+    atk_icon_x = settings.combat_bar_x + (settings.combat_bar_width - atk_icon_surface.get_width() + text_surface.get_width()) / 2 
+    atk_icon_y = settings.combat_bar_y + settings.combat_bar_height + 15 # +10 to account for the goal bar
+    text_x = atk_icon_x - text_surface.get_width() + 10 
+    text_y = atk_icon_y + (atk_icon_surface.get_height() - text_surface.get_height()) / 2 
+    surface.blit(atk_icon_surface, dest = (atk_icon_x, atk_icon_y))
+    surface.blit(text_surface, dest = (text_x, text_y))
 
 
 class Transition:
@@ -128,17 +145,34 @@ class main_scene(scene):
         # Settings button
         draw_button(screen, "Settings", 100, 670)
 
-        # Draw mob + combat bar
+        # Draw mob + combat bar. Also need to check if the player should take damage. 
         self.curr_mob.draw(screen, 810, 340)
+
+        mob = self.curr_mob
+        if mob.stats.combat_bar.hit_right or mob.stats.combat_bar.hit_left: # If the bar is in etiher boundary, check if it has already attacked before dishing out damage 
+            if mob.can_attack:
+                self.engine.player.damage(self.curr_mob.stats.atk)
+                mob.can_attack = False 
+                self.engine.player.can_attack = True
+        else:
+            mob.can_attack = True 
+    
         
-        # HUD
-        show_hp(screen, self.engine.player)
+        show_hud(screen, self.engine.player, self.atk_icon, self.background)
+        
         
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            if self.curr_mob.stats.combat_bar.goal:
-                self.curr_mob.damage(2)
-                self.curr_mob.stats.combat_bar.reset()
+            if self.engine.player.can_attack:
+                if self.curr_mob.stats.combat_bar.goal:
+                    # Fading text would be useful here as well (Perfect!)
+                    self.curr_mob.damage(self.engine.player.atk)
+                    self.engine.player.can_attack = False
+                    #self.curr_mob.stats.combat_bar.reset() resets combo bar 
+                else: 
+                    # Want to display some fading text as well like Missed! need write a function for that, many use cases 
+                    self.engine.player.damage(self.curr_mob.stats.atk) # Enemy attacks 
+                    self.engine.player.can_attack = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             # Clicking for resources 
@@ -149,8 +183,6 @@ class main_scene(scene):
                 self.engine.Transition.next_scene = shop_scene(self.engine)
             elif in_bounds('Settings', mouse_x, mouse_y):
                 self.engine.Transition.next_scene = settings_scene(self.engine)
-        
-        
             
 
 class shop_scene(scene):

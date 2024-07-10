@@ -21,9 +21,20 @@ NATIVE_HEIGHT = 720
 VAR_FACTOR = 10  # The lower this number, the more variation in the stats of objects of the same level 
 MOB_HEIGHT = 128
 MOB_SIZE = 128
+
+# Settings pertaining to the dimensions, positions and other tweakable parameters of the Bar class. 
 BAR_DIFFICULTY = 0.05
 BAR_SPEED_GROWTH = math.e # Base of the logarithm C
-COMBAT_INDICATOR_WIDTH = 5
+COMBAT_INDICATOR_WIDTH = 5 # Width of the combat indicator
+combat_bar_width = 250 
+combat_bar_height = 50
+combat_bar_x = 750 # x coordinate of combat bar ( top left )
+combat_bar_y = 500 # y coordinate of combat bar 
+work_bar_width = 50
+work_bar_height = 250
+work_bar_x = 500
+work_bar_y = 300
+
 
 width = 1280
 height = 720

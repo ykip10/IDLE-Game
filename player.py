@@ -4,9 +4,9 @@ class Player:
     def __init__(self, id, name):
         self.id = id
         self.name = name
-
         self.level = 1
 
+        self.can_attack = True 
         # Tweakable gameplay parameters; keep as integer 
         max_level = 100
         hp_gain_variation = 3    
@@ -32,3 +32,6 @@ class Player:
         self.hp += self.hp_growth + self.hp_var[self.level]
         self.atk += self.atk_growth + self.atk_var[self.level]
         self.level += 1
+
+    def damage(self, amount):
+        self.curr_hp -= amount

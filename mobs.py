@@ -120,17 +120,9 @@ class Combat_Bar(Bar):
         self.draw(surface)
 
     def reset(self):
-        """ Resets comabt indicator to starting position"""
-        self.x = self.x_bar
-        self.speed = self.ini_speed
-        self.acceleration = self.ini_acceleration
-        #         <-goal_w->
-        # ----------  ---  ------------  |     |
-        # |          |   |            |  | self.bar_height
-        # ----------  ---  ------------  |     |
-        # <-------self.bar_width------>
-        #
-        
+        """ Randomises position of goal 
+        """
+
         self.offset = np.random.uniform(-(self.bar_width - self.width) / 2 + self.min_distance, (self.bar_width - self.width) / 2 - self.min_distance) 
         self.goal_bar = pygame.Rect(self.x_bar + (self.bar_width - self.width - self.goal_width) / 2 - self.offset, self.y_bar - 10, self.goal_width, self.bar_height + 20)
 

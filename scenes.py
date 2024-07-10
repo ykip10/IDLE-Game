@@ -160,10 +160,12 @@ class main_scene(scene):
         # Show hud 
         show_hud(screen, self.engine.player, self.atk_icon, self.background)
 
-        # On death, reset mobs and players hp
+        # On player death, reset mobs and players hp
         if self.engine.player.curr_hp <= 0:
             self.curr_mob.current_hp = self.curr_mob.stats.hp
             self.engine.player.curr_hp = self.engine.player.hp
+
+        # On mob death, change mobs 
         
         
     def on_event(self, event): # Functionality (clicking) of main scene
@@ -173,7 +175,7 @@ class main_scene(scene):
                     # Fading text would be useful here as well (Perfect!)
                     self.curr_mob.damage(self.engine.player.atk)
                     self.engine.player.can_attack = False
-                    #self.curr_mob.stats.combat_bar.reset() resets combo bar 
+                    self.curr_mob.stats.combat_bar.reset() # resets goal bar 
                 else: 
                     # Want to display some fading text as well like Missed! need write a function for that, many use cases 
                     self.engine.player.damage(self.curr_mob.stats.atk) # Enemy attacks 

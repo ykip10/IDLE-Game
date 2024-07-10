@@ -203,8 +203,8 @@ class Work_Bar(Bar):
 class Mob_stats: 
     def __init__(self, level, player_id):
         self.level = level
-        base_hp = level * 50
-        base_atk = level * 5
+        base_hp = level * 20
+        base_atk = level * 3
 
         rng = np.random.default_rng(player_id)
         self.hp = round(rng.normal(loc = base_hp, scale = base_hp / settings.VAR_FACTOR))
@@ -234,6 +234,7 @@ class Mob:
     def draw(self, surface, x, y):
         """ Draws the sprite and level of the mob. (x, y) position are coordinates of top left of sprite rectangle.  
         """
+        self.hp_bar_width = self.max_bar_width * self.current_hp / self.stats.hp
         surface.blit(self.sprite, dest = (u.x_scaled(x), u.y_scaled(y)))
         u.draw_text(surface, f'{self.stats.level}', u.x_scaled(x-50), u.y_scaled(y-2))
         hp_bar_rect = pygame.Rect(u.x_scaled(x-30), u.y_scaled(y), self.hp_bar_width, self.hp_bar_height)
@@ -243,8 +244,7 @@ class Mob:
         self.stats.combat_bar.update(surface)
     def damage(self, amount):
         self.current_hp -= amount
-        self.hp_bar_width = self.max_bar_width * self.current_hp / self.stats.hp
-        self.damaged = True 
+
     #def kill(self):
 
 

@@ -157,8 +157,13 @@ class main_scene(scene):
         else:
             mob.can_attack = True 
     
-        
+        # Show hud 
         show_hud(screen, self.engine.player, self.atk_icon, self.background)
+
+        # On death, reset mobs and players hp
+        if self.engine.player.curr_hp <= 0:
+            self.curr_mob.current_hp = self.curr_mob.stats.hp
+            self.engine.player.curr_hp = self.engine.player.hp
         
         
     def on_event(self, event): # Functionality (clicking) of main scene

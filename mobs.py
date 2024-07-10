@@ -205,12 +205,21 @@ class Work_Bar(Bar):
         self.going_up = True 
 
         # goal indicator
-        self.proportion_goal = 0.97 # Need fill up this much of the bar to get a goal
-        goal_x, goal_y, goal_width, goal_height = self.x_bar - 5, self.y_bar + self.bar_height * (1 - self.proportion_goal), self.bar_width + 10, 1
-        self.goal_indicator = pygame.Rect(goal_x, goal_y, goal_width, goal_height)
+        self.proportion_goal1 = 0.99 # Need fill up this much of the bar to get a goal
+        self.proportion_goal2 = 0.96
+        self.proportion_goal3 = 0.9
+
+        goal_x = self.x_bar - 5 
+        goal1_y, goal2_y, goal3_y = self.y_bar + self.bar_height * (1 - self.proportion_goal1),  self.y_bar + self.bar_height * (1 - self.proportion_goal2),  self.y_bar + self.bar_height * (1 - self.proportion_goal3)
+        goal_width, goal_height = self.bar_width + 10, 1
+        self.goal1_indicator = pygame.Rect(goal_x, goal1_y, goal_width, goal_height)
+        self.goal2_indicator = pygame.Rect(goal_x, goal2_y, goal_width, goal_height)
+        self.goal3_indicator = pygame.Rect(goal_x, goal3_y, goal_width, goal_height)
 
         # combo
-        self.goal = False
+        self.goal1 = False
+        self.goal2 = False
+        self.goal3 = False
         self.combo = 1
 
     def draw(self, surface):
@@ -218,7 +227,9 @@ class Work_Bar(Bar):
         """
         u.ver_gradientRect(surface, settings.RED, settings.YELLOW, self.bar) # Draw gradiented meter
         pygame.draw.rect(surface, settings.BLACK, self.black_box)
-        pygame.draw.rect(surface, settings.WHITE, self.goal_indicator) 
+        pygame.draw.rect(surface, settings.WHITE, self.goal1_indicator) 
+        pygame.draw.rect(surface, settings.WHITE, self.goal2_indicator) 
+        pygame.draw.rect(surface, settings.WHITE, self.goal3_indicator) 
 
     def update(self, surface):
         """ Updates position of the black box and redraws the scene
@@ -242,7 +253,9 @@ class Work_Bar(Bar):
 
         self.black_box = pygame.Rect((self.x_bar, self.y_bar, self.bar_width, self.y))
 
-        self.goal = self.goal_indicator.topleft[1] >= self.black_box.bottomleft[1]  
+        self.goal1 = self.goal1_indicator.topleft[1] >= self.black_box.bottomleft[1]  
+        self.goal2 = self.goal1_indicator.bottomleft[1] <= self.black_box.bottomleft[1] <= self.goal2_indicator.topleft[1]
+        self.goal3 = self.goal2_indicator.bottomleft[1] <= self.black_box.bottomleft[1] <= self.goal3_indicator.topleft[1]
 
         self.draw(surface)
 

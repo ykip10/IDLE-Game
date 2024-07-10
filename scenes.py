@@ -294,8 +294,15 @@ class working_scene(scene):
                 self.engine.Transition.next_scene = main_scene(self.engine)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                if self.work.goal:
-                    r.gold.amount += 2*self.work.combo 
+                # Need fade away text everywhere here :D
+                if self.work.goal1:
+                    r.gold.amount += 3*self.work.combo 
+                    self.work.combo += 3
+                elif self.work.goal2:
+                    r.gold.amount += 2*self.work.combo
+                    self.work.combo += 2
+                elif self.work.goal3:
+                    r.gold.amount += self.work.combo
                     self.work.combo += 1
                 else:
                     self.work.combo = 1

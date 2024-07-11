@@ -21,7 +21,7 @@ class Player:
         # Create variation in stats gained from levelling up (just random noise)
         rng = np.random.default_rng(1461296)
         rand = rng.integers(-1, 1, max_level + 1)               # Stores max_level + 1 random values in between -1 and 1 (fixed) 
-        self.hp_var = hp_gain_variation * rand         # Variation in hp gain with a level up  (same for all players)
+        self.hp_var = hp_gain_variation * rand         # Variation in hp gain with a level up (same for all players)
         self.atk_var = atk_gain_variation * rand        # Variation in atk gain with a level up (same for all players)
 
         self.hp = 30

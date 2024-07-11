@@ -118,12 +118,18 @@ class main_scene(scene):
         self.slime_sheet = pygame.image.load(r'sprites/slimes/slime-Sheet.png').convert_alpha()
         self.atk_icon = pygame.image.load(r'sprites/icons/attack_icon.png').convert_alpha()
 
+
         self.curr_frame = u.get_mob_frame(self.slime_sheet, (32, 32), 1, 0, settings.MAIN_BACKGROUND)
-        self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1, 0)
+        self.mob_rotation = mobs.mob_rotation([self.curr_frame]*10, self.engine.player)
+        #self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1, 0)
+
         
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
         screen.fill(self.background)
+
+        mob = self.mob_rotation.curr_mob
+        player = self.engine.player
 
         pygame.display.set_caption('Main')
 
@@ -146,40 +152,45 @@ class main_scene(scene):
         draw_button(screen, "Settings", 100, 670)
 
         # Draw mob + combat bar. Also need to check if the player should take damage. 
-        self.curr_mob.draw(screen, 810, 340)
+        mob.draw(screen, 810, 340)
 
-        mob = self.curr_mob
         if mob.stats.combat_bar.hit_right or mob.stats.combat_bar.hit_left: # If the bar is in etiher boundary, check if it has already attacked before dishing out damage 
             if mob.can_attack:
-                self.engine.player.damage(self.curr_mob.stats.atk)
+                player.damage(mob.stats.atk)
                 mob.can_attack = False 
-                self.engine.player.can_attack = True
+                player.can_attack = True
         else:
             mob.can_attack = True 
     
         # Show hud 
-        show_hud(screen, self.engine.player, self.atk_icon, self.background)
+        show_hud(screen, player, self.atk_icon, self.background)
 
         # On player death, reset mobs and players hp
-        if self.engine.player.curr_hp <= 0:
-            self.curr_mob.current_hp = self.curr_mob.stats.hp
-            self.engine.player.curr_hp = self.engine.player.hp
+        if player.curr_hp <= 0:
+            player.can_attack = True
+            mob.current_hp = mob.stats.hp
+            player.curr_hp = player.hp
 
         # On mob death, change mobs 
-        
+        if mob.current_hp <= 0:
+            player.can_attack = True 
+            player.curr_hp = player.hp
+            self.mob_rotation.rotate()
         
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            if self.engine.player.can_attack:
-                if self.curr_mob.stats.combat_bar.goal:
+            mob = self.mob_rotation.curr_mob
+            player = self.engine.player
+            if player.can_attack:
+                if mob.stats.combat_bar.goal:
                     # Fading text would be useful here as well (Perfect!)
-                    self.curr_mob.damage(self.engine.player.atk)
-                    self.engine.player.can_attack = False
-                    self.curr_mob.stats.combat_bar.reset() # resets goal bar 
+                    mob.damage(self.engine.player.atk)
+                    player.can_attack = False
+                    mob.stats.combat_bar.reset() # resets goal bar 
                 else: 
                     # Want to display some fading text as well like Missed! need write a function for that, many use cases 
-                    self.engine.player.damage(self.curr_mob.stats.atk) # Enemy attacks 
-                    self.engine.player.can_attack = False
+                    player.damage(mob.stats.atk) # Enemy attacks 
+                    player.can_attack = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             # Clicking for resources 
@@ -308,5 +319,3 @@ class working_scene(scene):
                     self.work.combo = 1
                 self.work.hard_reset()
         
-            
-

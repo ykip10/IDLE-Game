@@ -175,6 +175,20 @@ class Mob:
     #def kill(self):
 
 
+class mob_rotation:
+    def __init__(self, sprites, player):
+        self.mob_names = 10*['Slime'] # + 10*['mob2'] + ... 
+        self.mob_levels = [i+1 for i in range(10)] # range (number of mobs)
+        self.sprites = [i for i in sprites]
+        self.player = player
+        self.j = 0 
+        self.curr_mob = Mob(self.sprites[self.j], self.mob_names[self.j], self.mob_levels[self.j], self.player.id)
+
+    def rotate(self):
+        self.j += 1
+        self.curr_mob = Mob(self.sprites[self.j], self.mob_names[self.j], self.mob_levels[self.j], self.player.id)
+
+
 class Work_Bar(Bar):
 
     """ Contains information about the bar on the employment screen and all associated mechanics

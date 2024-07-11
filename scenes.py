@@ -78,7 +78,11 @@ class DisplayEngine:
         self.delta = 0 
         self.Transition = Transition()
         self.player = player.Player(0, 'Skippay')
-
+        
+        # Mobs
+        self.slime_sheet = pygame.image.load(r'sprites/slimes/slime-Sheet.png').convert_alpha()
+        self.curr_frame = u.get_mob_frame(self.slime_sheet, (32, 32), 1, 0, settings.MAIN_BACKGROUND)
+        self.mob_rotation = mobs.mob_rotation([self.curr_frame]*10, self.player)
     def loop(self):
         while True:
             self.Transition.update()
@@ -92,6 +96,12 @@ class DisplayEngine:
 
             for i in range(r.Generator.id_no):
                 r.Generator.get_gen(i).update() # Update money 
+
+            # On mob death, change mobs 
+            if self.mob_rotation.curr_mob.current_hp <= 0:
+                self.player.can_attack = True 
+                self.player.curr_hp = self.player.hp
+                self.mob_rotation.rotate()
 
             self.Transition.current.draw() # Draw the current scene 
             self.clock.tick(settings.fps)
@@ -118,17 +128,15 @@ class main_scene(scene):
         self.slime_sheet = pygame.image.load(r'sprites/slimes/slime-Sheet.png').convert_alpha()
         self.atk_icon = pygame.image.load(r'sprites/icons/attack_icon.png').convert_alpha()
 
-
         self.curr_frame = u.get_mob_frame(self.slime_sheet, (32, 32), 1, 0, settings.MAIN_BACKGROUND)
         self.mob_rotation = mobs.mob_rotation([self.curr_frame]*10, self.engine.player)
-        #self.curr_mob = mobs.Mob(self.curr_frame, 'Slime', 1, 0)
 
         
     def draw(self): # Draw MAIN scene here 
         screen = self.engine.surface
         screen.fill(self.background)
 
-        mob = self.mob_rotation.curr_mob
+        mob = self.engine.mob_rotation.curr_mob
         player = self.engine.player
 
         pygame.display.set_caption('Main')
@@ -171,15 +179,10 @@ class main_scene(scene):
             mob.current_hp = mob.stats.hp
             player.curr_hp = player.hp
 
-        # On mob death, change mobs 
-        if mob.current_hp <= 0:
-            player.can_attack = True 
-            player.curr_hp = player.hp
-            self.mob_rotation.rotate()
         
     def on_event(self, event): # Functionality (clicking) of main scene
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            mob = self.mob_rotation.curr_mob
+            mob = self.engine.mob_rotation.curr_mob
             player = self.engine.player
             if player.can_attack:
                 if mob.stats.combat_bar.goal:
@@ -241,7 +244,8 @@ class shop_scene(scene):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             if in_bounds('Return', mouse_x, mouse_y): # "Return" button
-                self.engine.Transition.next_scene = main_scene(self.engine) 
+                self.engine.Transition.next_scene = main_scene(self.engine)
+                self.engine.mob_rotation.curr_mob.current_hp = self.engine.mob_rotation.curr_mob.stats.hp
             elif in_bounds("Buy Clicker 1", mouse_x, mouse_y):
                 r.clicker1.buy()
             elif in_bounds("Buy Clicker 2", mouse_x, mouse_y):

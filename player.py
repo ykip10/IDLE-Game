@@ -24,8 +24,8 @@ class Player:
         self.hp_var = hp_gain_variation * rand         # Variation in hp gain with a level up (same for all players)
         self.atk_var = atk_gain_variation * rand        # Variation in atk gain with a level up (same for all players)
 
-        self.hp = 30
-        self.atk = 4 
+        self.hp = 10
+        self.atk = 1 
         self.curr_hp = self.hp
     
     def level_up(self):

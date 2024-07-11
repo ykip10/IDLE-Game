@@ -130,8 +130,8 @@ class Combat_Bar(Bar):
 class Mob_stats: 
     def __init__(self, level, player_id):
         self.level = level
-        base_hp = level * 20
-        base_atk = level * 3
+        base_hp = 5*level
+        base_atk = level * 1
 
         rng = np.random.default_rng(player_id)
         self.hp = round(rng.normal(loc = base_hp, scale = base_hp / settings.VAR_FACTOR))

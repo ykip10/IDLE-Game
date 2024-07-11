@@ -34,7 +34,7 @@ work_bar_width = 20
 work_bar_height = 250
 work_bar_x = 1100
 work_bar_y = 400
-MAX_WORK_ACCELERATION = 0.4
+MAX_WORK_ACCELERATION = 0.2
 
 width = 1280
 height = 720

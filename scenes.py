@@ -308,13 +308,12 @@ class working_scene(scene):
                 # Need fade away text everywhere here :D
                 if self.work.goal1:
                     r.gold.amount += 3*self.work.combo 
-                    self.work.combo += 3
+                    self.work.combo += 2
                 elif self.work.goal2:
                     r.gold.amount += 2*self.work.combo
-                    self.work.combo += 2
+                    self.work.combo += 1
                 elif self.work.goal3:
                     r.gold.amount += self.work.combo
-                    self.work.combo += 1
                 else:
                     self.work.combo = 1
                 self.work.hard_reset()

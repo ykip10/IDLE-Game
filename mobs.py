@@ -280,5 +280,6 @@ class Work_Bar(Bar):
         self.y = self.bar_height
         self.going_up = True
         self.speed = self.ini_speed
-        self.acceleration = self.ini_acceleration*math.sqrt(self.combo)
+        if self.ini_acceleration <= settings.MAX_WORK_ACCELERATION:
+            self.acceleration = self.ini_acceleration*self.combo
 

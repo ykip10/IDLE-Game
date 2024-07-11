@@ -30,11 +30,11 @@ combat_bar_width = 250
 combat_bar_height = 50
 combat_bar_x = 750 # x coordinate of combat bar ( top left )
 combat_bar_y = 500 # y coordinate of combat bar 
-work_bar_width = 5
+work_bar_width = 20
 work_bar_height = 250
-work_bar_x = 500
-work_bar_y = 300
-
+work_bar_x = 1100
+work_bar_y = 400
+MAX_WORK_ACCELERATION = 0.4
 
 width = 1280
 height = 720
